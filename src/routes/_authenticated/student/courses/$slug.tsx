@@ -27,12 +27,12 @@ function StudentCoursePage() {
   const { data: lessons = [] } = useQuery({
     queryKey: ["s-lessons", course?.id],
     enabled: !!course,
-    queryFn: async () => (await supabase.from("lessons").select("*").eq("course_id", course!.id).order("order_index")).data ?? [],
+    queryFn: async () => (await supabase.from("lessons").select("*").eq("course_id", course!.id).order("sort_order")).data ?? [],
   });
   const { data: materials = [] } = useQuery({
     queryKey: ["s-materials", course?.id],
     enabled: !!course,
-    queryFn: async () => (await supabase.from("materials").select("*").eq("course_id", course!.id).order("created_at")).data ?? [],
+    queryFn: async () => (await supabase.from("materials").select("*").eq("course_id", course!.id).order("sort_order")).data ?? [],
   });
   const { data: progress = [] } = useQuery({
     queryKey: ["s-progress", course?.id, user?.id],
@@ -50,19 +50,17 @@ function StudentCoursePage() {
   const current = lessons.find((l: any) => l.id === activeLesson) || lessons[0];
 
   async function markComplete(lessonId: string) {
-    if (!user) return;
+    if (!user || !course) return;
     const { error } = await supabase.from("lesson_progress").upsert(
-      { student_id: user.id, lesson_id: lessonId, completed: true, completed_at: new Date().toISOString() },
+      { student_id: user.id, lesson_id: lessonId, course_id: course.id, completed: true },
       { onConflict: "student_id,lesson_id" }
     );
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["s-progress"] });
     toast.success("Lesson marked complete");
 
-    // Certificate at 100%
-    if (course && completed.size + 1 === lessons.length) {
-      const code = `CRF-${course.slug.toUpperCase()}-${Date.now().toString(36).toUpperCase()}`;
-      await supabase.from("certificates").upsert({ student_id: user.id, course_id: course.id, code }, { onConflict: "student_id,course_id" });
+    if (completed.size + 1 === lessons.length) {
+      await supabase.from("certificates").upsert({ student_id: user.id, course_id: course.id }, { onConflict: "student_id,course_id" });
       toast.success("🎉 Course complete! Your certificate is ready.");
     }
   }
@@ -147,7 +145,7 @@ function StudentCoursePage() {
               ) : (
                 <div className="mt-4 aspect-video grid place-items-center rounded-xl bg-navy/5 text-muted-foreground">Video coming soon</div>
               )}
-              {current.content && <p className="mt-4 text-muted-foreground whitespace-pre-wrap">{current.content}</p>}
+              {current.description && <p className="mt-4 text-muted-foreground whitespace-pre-wrap">{current.description}</p>}
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   onClick={() => markComplete(current.id)}

@@ -15,7 +15,7 @@ const nav = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { user, roles } = useAuth();
+  const { user, roles, signOut } = useAuth();
   const dashHref =
     !user ? "/auth"
     : primaryRole(roles) === "admin" ? "/admin"
@@ -59,6 +59,11 @@ export function Header() {
           >
             {user ? "Dashboard" : "Sign in"}
           </Link>
+          {user && (
+            <button onClick={() => signOut()} className="px-3 py-2 rounded-md text-sm font-medium text-navy hover:bg-accent">
+              Sign out
+            </button>
+          )}
         </div>
         <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
           {open ? <X /> : <Menu />}

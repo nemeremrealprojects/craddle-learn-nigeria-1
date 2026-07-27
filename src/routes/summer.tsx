@@ -13,10 +13,25 @@ export const Route = createFileRoute("/summer")({
       { name: "description", content: "Holiday enrichment: Summer English, Mathematics, Reading, Revision and the Holiday Learning Program. ₦3,000 per course." },
       { property: "og:title", content: "Summer courses — CRF Online Academy" },
       { property: "og:description", content: "Nigerian holiday learning courses at ₦3,000 each." },
+      { property: "og:url", content: "https://craddle-learn-nigeria.lovable.app/summer" },
+    ],
+    links: [{ rel: "canonical", href: "https://craddle-learn-nigeria.lovable.app/summer" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Summer courses — CRF Online Academy",
+          description: "Nigerian holiday learning courses for Nursery and Primary pupils.",
+          url: "https://craddle-learn-nigeria.lovable.app/summer",
+        }),
+      },
     ],
   }),
   component: SummerPage,
 });
+
 
 function SummerPage() {
   const { data: courses = [] } = useQuery({

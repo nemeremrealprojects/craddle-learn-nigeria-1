@@ -14,10 +14,25 @@ export const Route = createFileRoute("/courses/")({
       { name: "description", content: "Full catalog: Kindergarten and Primary 1–6 English, Mathematics, Basic Science, Reading Skills, Phonics and Exam Prep. ₦3,000 per course." },
       { property: "og:title", content: "All courses — CRF Online Academy" },
       { property: "og:description", content: "Kindergarten and Primary 1–6 courses at ₦3,000 each." },
+      { property: "og:url", content: "https://craddle-learn-nigeria.lovable.app/courses" },
+    ],
+    links: [{ rel: "canonical", href: "https://craddle-learn-nigeria.lovable.app/courses" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "All courses — CRF Online Academy",
+          description: "Full catalog of Kindergarten and Primary 1–6 online courses.",
+          url: "https://craddle-learn-nigeria.lovable.app/courses",
+        }),
+      },
     ],
   }),
   component: CoursesPage,
 });
+
 
 function CoursesPage() {
   const [category, setCategory] = useState<string>("all");

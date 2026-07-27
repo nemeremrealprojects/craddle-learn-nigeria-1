@@ -57,11 +57,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "CRF Online Academy — Nigeria's premium online Nursery & Primary school" },
-      { name: "description", content: "Craddle Reading Foundation Online Academy — Kindergarten and Primary 1–6 online learning with videos, PDFs, quizzes and certificates. From ₦3,000." },
+      { title: "CRF Online Academy" },
+      { name: "description", content: "Nigerian online Nursery and Primary school — video lessons, PDF notes, quizzes and certificates." },
       { name: "author", content: "CRF Online Academy" },
-      { property: "og:title", content: "CRF Online Academy" },
-      { property: "og:description", content: "Nigeria's premium online Nursery & Primary academy — video lessons, PDF notes, quizzes, and certificates." },
+      { property: "og:site_name", content: "CRF Online Academy" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -72,12 +71,40 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "EducationalOrganization",
+          name: "CRF Online Academy",
+          alternateName: "Craddle Reading Foundation Online Academy",
+          url: "https://craddle-learn-nigeria.lovable.app",
+          description: "Nigerian online Nursery and Primary school offering Kindergarten and Primary 1–6 courses.",
+          address: { "@type": "PostalAddress", addressCountry: "NG" },
+          contactPoint: [
+            { "@type": "ContactPoint", telephone: "+234-810-330-0817", contactType: "customer service", areaServed: "NG" },
+            { "@type": "ContactPoint", telephone: "+234-913-238-6625", contactType: "customer service", areaServed: "NG" },
+          ],
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "CRF Online Academy",
+          url: "https://craddle-learn-nigeria.lovable.app",
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
+
 
 function RootShell({ children }: { children: ReactNode }) {
   return (

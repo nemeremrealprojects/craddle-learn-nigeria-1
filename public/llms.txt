@@ -1,0 +1,16 @@
+# CRF Online Academy
+
+> Craddle Reading Foundation (CRF) Online Academy — Nigeria's online Nursery and Primary school. Kindergarten and Primary 1–6 courses with video lessons, PDF workbooks, quizzes, assignments and certificates. ₦3,000 per course, paid securely with Paystack.
+
+## Pages
+
+- [Home](/): Overview of the academy, featured courses, and how learning works.
+- [All courses](/courses): Full catalog of Kindergarten and Primary 1–6 courses across English, Mathematics, Basic Science, Reading Skills, Phonics and Common Entrance exam prep.
+- [Summer courses](/summer): Holiday and enrichment courses — Summer English, Mathematics, Reading, Revision and general enrichment.
+- [About](/about): Our story, mission, and what we believe about Nigerian basic education.
+- [Admissions](/admissions): Apply online for the current academic session.
+- [Contact](/contact): Phone, WhatsApp and email — the team responds within 24 hours.
+
+## Optional
+
+- [Sign in](/auth): Student, parent, teacher and admin sign-in.

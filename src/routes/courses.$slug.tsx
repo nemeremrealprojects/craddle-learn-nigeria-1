@@ -11,15 +11,68 @@ import { initializePayment } from "@/lib/payments.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Clock, Video, FileText, ClipboardList, Award, Loader2 } from "lucide-react";
 
+const courseQueryOptions = (slug: string) => ({
+  queryKey: ["course", slug],
+  queryFn: async () => {
+    const { data } = await supabase.from("courses").select("*").eq("slug", slug).maybeSingle();
+    return data;
+  },
+});
+
 export const Route = createFileRoute("/courses/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug} — CRF Online Academy` },
-      { name: "description", content: "Complete online course with video lessons, PDF notes, quizzes and certificate. ₦3,000." },
-    ],
-  }),
+  loader: async ({ params, context }) => {
+    const course = await context.queryClient.ensureQueryData(courseQueryOptions(params.slug));
+    return { course };
+  },
+  head: ({ params, loaderData }) => {
+    const course = loaderData?.course as
+      | { title?: string; description?: string | null; price_kobo?: number; level?: string }
+      | null
+      | undefined;
+    const title = course?.title ? `${course.title} — CRF Online Academy` : `${params.slug} — CRF Online Academy`;
+    const desc = course?.description
+      ? course.description.slice(0, 155)
+      : "Complete online course with video lessons, PDF notes, quizzes and certificate. ₦3,000.";
+    const url = `https://craddle-learn-nigeria.lovable.app/courses/${params.slug}`;
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: desc },
+      { property: "og:title", content: course?.title ?? params.slug },
+      { property: "og:description", content: desc },
+      { property: "og:type", content: "product" },
+      { property: "og:url", content: url },
+    ];
+    const scripts = course
+      ? [
+          {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Course",
+              name: course.title,
+              description: course.description ?? undefined,
+              provider: {
+                "@type": "EducationalOrganization",
+                name: "CRF Online Academy",
+                url: "https://craddle-learn-nigeria.lovable.app",
+              },
+              educationalLevel: course.level,
+              offers: {
+                "@type": "Offer",
+                price: ((course.price_kobo ?? 0) / 100).toFixed(2),
+                priceCurrency: "NGN",
+                url,
+                availability: "https://schema.org/InStock",
+              },
+            }),
+          },
+        ]
+      : undefined;
+    return { meta, links: [{ rel: "canonical", href: url }], scripts };
+  },
   component: CourseDetail,
 });
+
 
 function CourseDetail() {
   const { slug } = Route.useParams();

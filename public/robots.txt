@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /auth
+Disallow: /payment/
+Disallow: /student/
+Disallow: /teacher/
+Disallow: /parent/
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://craddle-learn-nigeria.lovable.app/sitemap.xml

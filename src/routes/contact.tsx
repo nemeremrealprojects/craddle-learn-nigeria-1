@@ -10,14 +10,17 @@ import { CRF_CONTACT } from "@/lib/brand";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact us — CRF Online Academy" },
+      { title: "Contact — CRF Online Academy" },
       { name: "description", content: `Call or WhatsApp us on ${CRF_CONTACT.phone1} or ${CRF_CONTACT.phone2}.` },
       { property: "og:title", content: "Contact — CRF Online Academy" },
       { property: "og:description", content: "Get in touch with the CRF Academy team." },
+      { property: "og:url", content: "https://craddle-learn-nigeria.lovable.app/contact" },
     ],
+    links: [{ rel: "canonical", href: "https://craddle-learn-nigeria.lovable.app/contact" }],
   }),
   component: ContactPage,
 });
+
 
 function ContactPage() {
   const [form, setForm] = useState({ parent_name: "", parent_phone: "", parent_email: "", child_name: "", level: "Primary 1", notes: "" });

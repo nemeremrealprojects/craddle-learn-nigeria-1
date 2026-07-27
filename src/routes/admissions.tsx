@@ -14,10 +14,13 @@ export const Route = createFileRoute("/admissions")({
       { name: "description", content: "Apply for admission to CRF Online Academy — Nursery and Primary online school in Nigeria." },
       { property: "og:title", content: "Admissions — CRF Online Academy" },
       { property: "og:description", content: "Enroll your child in our online Nursery or Primary program." },
+      { property: "og:url", content: "https://craddle-learn-nigeria.lovable.app/admissions" },
     ],
+    links: [{ rel: "canonical", href: "https://craddle-learn-nigeria.lovable.app/admissions" }],
   }),
   component: AdmissionsPage,
 });
+
 
 function AdmissionsPage() {
   const [form, setForm] = useState({ parent_name: "", parent_phone: "", parent_email: "", child_name: "", child_age: "", level: "Primary 1", notes: "" });

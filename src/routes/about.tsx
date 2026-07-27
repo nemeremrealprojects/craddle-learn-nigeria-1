@@ -6,14 +6,17 @@ import { GraduationCap, Heart, Target, Users } from "lucide-react";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About us — CRF Online Academy" },
-      { name: "description", content: "Craddle Reading Foundation (CRF) Online Academy is Nigeria's premium online Nursery and Primary school." },
-      { property: "og:title", content: "About us — CRF Online Academy" },
+      { title: "About — CRF Online Academy" },
+      { name: "description", content: "Craddle Reading Foundation Online Academy is Nigeria's online Nursery and Primary school." },
+      { property: "og:title", content: "About — CRF Online Academy" },
       { property: "og:description", content: "Our story and mission for Nigerian pupils." },
+      { property: "og:url", content: "https://craddle-learn-nigeria.lovable.app/about" },
     ],
+    links: [{ rel: "canonical", href: "https://craddle-learn-nigeria.lovable.app/about" }],
   }),
   component: AboutPage,
 });
+
 
 function AboutPage() {
   return (

@@ -9,14 +9,17 @@ import { BookOpen, Video, FileText, Award, Phone, ArrowRight, CheckCircle2, Grad
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "CRF Online Academy — Nigeria's premium online Nursery & Primary school" },
-      { name: "description", content: "Kindergarten and Primary 1–6 courses with video lessons, PDF notes, quizzes, assignments and certificates. Pay ₦3,000 per course with Paystack." },
-      { property: "og:title", content: "CRF Online Academy" },
-      { property: "og:description", content: "Video lessons, PDFs, quizzes and certificates for Nigerian Nursery & Primary pupils." },
+      { title: "Nigerian Online Nursery & Primary School — CRF Academy" },
+      { name: "description", content: "Kindergarten and Primary 1–6 online courses with video lessons, PDF notes, quizzes and certificates. From ₦3,000, paid with Paystack." },
+      { property: "og:title", content: "Nigerian Online Nursery & Primary School — CRF Academy" },
+      { property: "og:description", content: "Video lessons, PDFs, quizzes and certificates for Nigerian Nursery & Primary pupils. From ₦3,000." },
+      { property: "og:url", content: "https://craddle-learn-nigeria.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://craddle-learn-nigeria.lovable.app/" }],
   }),
   component: HomePage,
 });
+
 
 function HomePage() {
   const { data: featured } = useQuery({

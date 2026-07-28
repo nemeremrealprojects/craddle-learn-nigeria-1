@@ -34,6 +34,16 @@ function StudentCoursePage() {
     enabled: !!course,
     queryFn: async () => (await supabase.from("materials").select("*").eq("course_id", course!.id).order("sort_order")).data ?? [],
   });
+  const { data: quizzes = [] } = useQuery({
+    queryKey: ["s-quizzes", course?.id],
+    enabled: !!course,
+    queryFn: async () => (await supabase.from("quizzes").select("*, quiz_questions(*)").eq("course_id", course!.id)).data ?? [],
+  });
+  const { data: assignments = [] } = useQuery({
+    queryKey: ["s-assignments", course?.id],
+    enabled: !!course,
+    queryFn: async () => (await supabase.from("assignments").select("*").eq("course_id", course!.id)).data ?? [],
+  });
   const { data: progress = [] } = useQuery({
     queryKey: ["s-progress", course?.id, user?.id],
     enabled: !!course && !!user,

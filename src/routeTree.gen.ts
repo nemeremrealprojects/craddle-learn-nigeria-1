@@ -20,6 +20,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
 import { Route as PaymentCallbackRouteImport } from './routes/payment.callback'
 import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher/index'
 import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authenticated/student/index'
 import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenticated/parent/index'
@@ -81,6 +82,11 @@ const CoursesSlugRoute = CoursesSlugRouteImport.update({
   path: '/courses/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthenticatedTeacherIndexRoute =
   AuthenticatedTeacherIndexRouteImport.update({
     id: '/teacher/',
@@ -121,10 +127,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admissions': typeof AdmissionsRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/summer': typeof SummerRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/payment/callback': typeof PaymentCallbackRoute
   '/courses/': typeof CoursesIndexRoute
@@ -139,10 +146,11 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admissions': typeof AdmissionsRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/summer': typeof SummerRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/payment/callback': typeof PaymentCallbackRoute
   '/courses': typeof CoursesIndexRoute
@@ -159,10 +167,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/admissions': typeof AdmissionsRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/contact': typeof ContactRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/summer': typeof SummerRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/courses/$slug': typeof CoursesSlugRoute
   '/payment/callback': typeof PaymentCallbackRoute
   '/courses/': typeof CoursesIndexRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/sitemap.xml'
     | '/summer'
+    | '/auth/callback'
     | '/courses/$slug'
     | '/payment/callback'
     | '/courses/'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/sitemap.xml'
     | '/summer'
+    | '/auth/callback'
     | '/courses/$slug'
     | '/payment/callback'
     | '/courses'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/sitemap.xml'
     | '/summer'
+    | '/auth/callback'
     | '/courses/$slug'
     | '/payment/callback'
     | '/courses/'
@@ -236,7 +248,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   AdmissionsRoute: typeof AdmissionsRoute
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   ContactRoute: typeof ContactRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SummerRoute: typeof SummerRoute
@@ -325,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CoursesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_authenticated/teacher/': {
       id: '/_authenticated/teacher/'
       path: '/teacher'
@@ -390,12 +409,22 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   AdmissionsRoute: AdmissionsRoute,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   ContactRoute: ContactRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SummerRoute: SummerRoute,
@@ -407,13 +436,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

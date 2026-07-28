@@ -166,6 +166,25 @@ function StudentCoursePage() {
                 </button>
                 <Link to="/student" className="rounded-lg border border-border px-5 py-2.5 font-semibold">Back to dashboard</Link>
               </div>
+
+              {(() => {
+                const idx = lessons.findIndex((l: any) => l.id === current.id);
+                const quiz = quizzes[idx];
+                const assignment = assignments[idx];
+                return (
+                  <>
+                    {quiz && <QuizBlock quiz={quiz} />}
+                    {assignment && (
+                      <div className="mt-8 rounded-2xl border-2 border-gold/30 bg-gold/5 p-6">
+                        <div className="flex items-center gap-2 text-navy font-display text-xl font-bold">
+                          <ClipboardList className="h-5 w-5 text-gold-foreground" /> {assignment.title}
+                        </div>
+                        <p className="mt-3 whitespace-pre-wrap text-sm md:text-base text-foreground/90">{assignment.instructions}</p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </>
           ) : (
             <div className="text-center py-16">

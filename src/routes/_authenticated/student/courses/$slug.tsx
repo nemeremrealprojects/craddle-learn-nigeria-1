@@ -34,6 +34,16 @@ function StudentCoursePage() {
     enabled: !!course,
     queryFn: async () => (await supabase.from("materials").select("*").eq("course_id", course!.id).order("sort_order")).data ?? [],
   });
+  const { data: quizzes = [] } = useQuery({
+    queryKey: ["s-quizzes", course?.id],
+    enabled: !!course,
+    queryFn: async () => (await supabase.from("quizzes").select("*, quiz_questions(*)").eq("course_id", course!.id)).data ?? [],
+  });
+  const { data: assignments = [] } = useQuery({
+    queryKey: ["s-assignments", course?.id],
+    enabled: !!course,
+    queryFn: async () => (await supabase.from("assignments").select("*").eq("course_id", course!.id)).data ?? [],
+  });
   const { data: progress = [] } = useQuery({
     queryKey: ["s-progress", course?.id, user?.id],
     enabled: !!course && !!user,
@@ -156,6 +166,25 @@ function StudentCoursePage() {
                 </button>
                 <Link to="/student" className="rounded-lg border border-border px-5 py-2.5 font-semibold">Back to dashboard</Link>
               </div>
+
+              {(() => {
+                const idx = lessons.findIndex((l: any) => l.id === current.id);
+                const quiz = quizzes[idx];
+                const assignment = assignments[idx];
+                return (
+                  <>
+                    {quiz && <QuizBlock quiz={quiz} />}
+                    {assignment && (
+                      <div className="mt-8 rounded-2xl border-2 border-gold/30 bg-gold/5 p-6">
+                        <div className="flex items-center gap-2 text-navy font-display text-xl font-bold">
+                          <ClipboardList className="h-5 w-5 text-gold-foreground" /> {assignment.title}
+                        </div>
+                        <p className="mt-3 whitespace-pre-wrap text-sm md:text-base text-foreground/90">{assignment.instructions}</p>
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
             </>
           ) : (
             <div className="text-center py-16">
@@ -173,4 +202,70 @@ function VideoPlayer({ url }: { url: string }) {
   const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
   if (yt) return <iframe className="w-full h-full" src={`https://www.youtube.com/embed/${yt[1]}`} title="Lesson video" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen />;
   return <video className="w-full h-full" src={url} controls />;
+}
+
+function QuizBlock({ quiz }: { quiz: any }) {
+  const questions = [...(quiz.quiz_questions ?? [])].sort((a: any, b: any) => a.sort_order - b.sort_order);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  if (!questions.length) return null;
+  const score = questions.reduce((s, q) => s + (answers[q.id] === q.correct_index ? 1 : 0), 0);
+  const answered = questions.filter((q) => answers[q.id] !== undefined).length;
+  return (
+    <div className="mt-8 rounded-2xl border-2 border-navy/15 bg-cream p-6">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="font-display text-xl font-bold text-navy">🎯 {quiz.title}</div>
+        <div className="text-sm font-semibold text-navy">Score: <span className="text-gold-foreground">{score}</span> / {questions.length}</div>
+      </div>
+      {quiz.description && <p className="mt-2 text-sm text-muted-foreground">{quiz.description}</p>}
+      <ol className="mt-5 space-y-5">
+        {questions.map((q: any, qi: number) => {
+          const chosen = answers[q.id];
+          const opts: string[] = Array.isArray(q.options) ? q.options : [];
+          return (
+            <li key={q.id} className="rounded-xl bg-card border border-border p-4">
+              <div className="font-semibold text-navy"><span className="mr-1 opacity-60">{qi + 1}.</span>{q.question}</div>
+              <div className="mt-3 grid sm:grid-cols-2 gap-2">
+                {opts.map((opt, i) => {
+                  const picked = chosen === i;
+                  const isCorrect = i === q.correct_index;
+                  const showState = chosen !== undefined && (picked || isCorrect);
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => setAnswers((a) => ({ ...a, [q.id]: i }))}
+                      className={`text-left rounded-lg border px-3 py-2 text-sm transition ${
+                        showState
+                          ? isCorrect
+                            ? "border-green-500 bg-green-50 text-green-800"
+                            : picked
+                              ? "border-red-400 bg-red-50 text-red-800"
+                              : "border-border"
+                          : picked
+                            ? "border-navy bg-navy/5"
+                            : "border-border hover:bg-accent"
+                      }`}
+                    >
+                      <span className="font-bold mr-2">{String.fromCharCode(65 + i)}.</span>{opt}
+                      {chosen !== undefined && isCorrect && <span className="ml-2">✓</span>}
+                      {picked && !isCorrect && <span className="ml-2">✗</span>}
+                    </button>
+                  );
+                })}
+              </div>
+              {chosen !== undefined && (
+                <div className={`mt-2 text-sm font-semibold ${chosen === q.correct_index ? "text-green-700" : "text-red-700"}`}>
+                  {chosen === q.correct_index ? "Great job! That's correct 🎉" : `Not quite — the correct answer is ${String.fromCharCode(65 + q.correct_index)}.`}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      {answered === questions.length && (
+        <div className="mt-5 rounded-xl bg-gold-gradient text-gold-foreground font-bold p-4 text-center">
+          You finished the quiz! Final score: {score} / {questions.length} {score === questions.length ? "— Perfect! 🌟" : score >= quiz.pass_score ? "— Well done! 👏" : "— Keep practising, you've got this! 💪"}
+        </div>
+      )}
+    </div>
+  );
 }

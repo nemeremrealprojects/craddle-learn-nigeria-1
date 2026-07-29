@@ -37,7 +37,7 @@ function StudentCoursePage() {
   const { data: quizzes = [] } = useQuery({
     queryKey: ["s-quizzes", course?.id],
     enabled: !!course,
-    queryFn: async () => (await supabase.from("quizzes").select("*, quiz_questions(*)").eq("course_id", course!.id)).data ?? [],
+    queryFn: async () => (await supabase.from("quizzes").select("*, quiz_questions(id, quiz_id, question, options, sort_order)").eq("course_id", course!.id)).data ?? [],
   });
   const { data: assignments = [] } = useQuery({
     queryKey: ["s-assignments", course?.id],

@@ -70,8 +70,8 @@ function StudentCoursePage() {
     toast.success("Lesson marked complete");
 
     if (completed.size + 1 === lessons.length) {
-      await supabase.from("certificates").upsert({ student_id: user.id, course_id: course.id }, { onConflict: "student_id,course_id" });
-      toast.success("🎉 Course complete! Your certificate is ready.");
+      const { error: certErr } = await supabase.rpc("issue_certificate", { _course_id: course.id });
+      if (!certErr) toast.success("🎉 Course complete! Your certificate is ready.");
     }
   }
 

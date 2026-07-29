@@ -633,7 +633,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_quiz_answer: {
+        Args: { _answer: number; _question_id: string }
+        Returns: {
+          correct_index: number
+          is_correct: boolean
+        }[]
+      }
+      issue_certificate: { Args: { _course_id: string }; Returns: string }
+      submit_quiz: {
+        Args: { _answers: Json; _quiz_id: string }
+        Returns: {
+          attempt_id: string
+          score: number
+          total: number
+        }[]
+      }
     }
     Enums: {
       app_role: "student" | "parent" | "teacher" | "admin"

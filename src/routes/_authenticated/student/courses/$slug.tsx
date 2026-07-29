@@ -37,7 +37,7 @@ function StudentCoursePage() {
   const { data: quizzes = [] } = useQuery({
     queryKey: ["s-quizzes", course?.id],
     enabled: !!course,
-    queryFn: async () => (await supabase.from("quizzes").select("*, quiz_questions(*)").eq("course_id", course!.id)).data ?? [],
+    queryFn: async () => (await supabase.from("quizzes").select("*, quiz_questions(id, quiz_id, question, options, sort_order)").eq("course_id", course!.id)).data ?? [],
   });
   const { data: assignments = [] } = useQuery({
     queryKey: ["s-assignments", course?.id],
@@ -70,8 +70,8 @@ function StudentCoursePage() {
     toast.success("Lesson marked complete");
 
     if (completed.size + 1 === lessons.length) {
-      await supabase.from("certificates").upsert({ student_id: user.id, course_id: course.id }, { onConflict: "student_id,course_id" });
-      toast.success("🎉 Course complete! Your certificate is ready.");
+      const { error: certErr } = await supabase.rpc("issue_certificate", { _course_id: course.id });
+      if (!certErr) toast.success("🎉 Course complete! Your certificate is ready.");
     }
   }
 
@@ -207,19 +207,39 @@ function VideoPlayer({ url }: { url: string }) {
 function QuizBlock({ quiz }: { quiz: any }) {
   const questions = [...(quiz.quiz_questions ?? [])].sort((a: any, b: any) => a.sort_order - b.sort_order);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [feedback, setFeedback] = useState<Record<string, { is_correct: boolean; correct_index: number }>>({});
+  const [submitted, setSubmitted] = useState<{ score: number; total: number } | null>(null);
   if (!questions.length) return null;
-  const score = questions.reduce((s, q) => s + (answers[q.id] === q.correct_index ? 1 : 0), 0);
   const answered = questions.filter((q) => answers[q.id] !== undefined).length;
+  const liveScore = Object.values(feedback).filter((f) => f.is_correct).length;
+
+  async function pick(qid: string, i: number) {
+    if (feedback[qid] !== undefined || submitted) return;
+    setAnswers((a) => ({ ...a, [qid]: i }));
+    const { data, error } = await supabase.rpc("check_quiz_answer", { _question_id: qid, _answer: i });
+    if (error) { toast.error(error.message); return; }
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) setFeedback((f) => ({ ...f, [qid]: { is_correct: !!row.is_correct, correct_index: row.correct_index } }));
+  }
+
+  async function finish() {
+    const { data, error } = await supabase.rpc("submit_quiz", { _quiz_id: quiz.id, _answers: answers });
+    if (error) { toast.error(error.message); return; }
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) setSubmitted({ score: row.score, total: row.total });
+  }
+
   return (
     <div className="mt-8 rounded-2xl border-2 border-navy/15 bg-cream p-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="font-display text-xl font-bold text-navy">🎯 {quiz.title}</div>
-        <div className="text-sm font-semibold text-navy">Score: <span className="text-gold-foreground">{score}</span> / {questions.length}</div>
+        <div className="text-sm font-semibold text-navy">Score: <span className="text-gold-foreground">{submitted?.score ?? liveScore}</span> / {questions.length}</div>
       </div>
       {quiz.description && <p className="mt-2 text-sm text-muted-foreground">{quiz.description}</p>}
       <ol className="mt-5 space-y-5">
         {questions.map((q: any, qi: number) => {
           const chosen = answers[q.id];
+          const fb = feedback[q.id];
           const opts: string[] = Array.isArray(q.options) ? q.options : [];
           return (
             <li key={q.id} className="rounded-xl bg-card border border-border p-4">
@@ -227,12 +247,13 @@ function QuizBlock({ quiz }: { quiz: any }) {
               <div className="mt-3 grid sm:grid-cols-2 gap-2">
                 {opts.map((opt, i) => {
                   const picked = chosen === i;
-                  const isCorrect = i === q.correct_index;
-                  const showState = chosen !== undefined && (picked || isCorrect);
+                  const isCorrect = fb ? i === fb.correct_index : false;
+                  const showState = fb !== undefined && (picked || isCorrect);
                   return (
                     <button
                       key={i}
-                      onClick={() => setAnswers((a) => ({ ...a, [q.id]: i }))}
+                      onClick={() => pick(q.id, i)}
+                      disabled={fb !== undefined}
                       className={`text-left rounded-lg border px-3 py-2 text-sm transition ${
                         showState
                           ? isCorrect
@@ -246,24 +267,29 @@ function QuizBlock({ quiz }: { quiz: any }) {
                       }`}
                     >
                       <span className="font-bold mr-2">{String.fromCharCode(65 + i)}.</span>{opt}
-                      {chosen !== undefined && isCorrect && <span className="ml-2">✓</span>}
-                      {picked && !isCorrect && <span className="ml-2">✗</span>}
+                      {fb && isCorrect && <span className="ml-2">✓</span>}
+                      {picked && fb && !fb.is_correct && <span className="ml-2">✗</span>}
                     </button>
                   );
                 })}
               </div>
-              {chosen !== undefined && (
-                <div className={`mt-2 text-sm font-semibold ${chosen === q.correct_index ? "text-green-700" : "text-red-700"}`}>
-                  {chosen === q.correct_index ? "Great job! That's correct 🎉" : `Not quite — the correct answer is ${String.fromCharCode(65 + q.correct_index)}.`}
+              {fb && (
+                <div className={`mt-2 text-sm font-semibold ${fb.is_correct ? "text-green-700" : "text-red-700"}`}>
+                  {fb.is_correct ? "Great job! That's correct 🎉" : `Not quite — the correct answer is ${String.fromCharCode(65 + fb.correct_index)}.`}
                 </div>
               )}
             </li>
           );
         })}
       </ol>
-      {answered === questions.length && (
+      {answered === questions.length && !submitted && (
+        <button onClick={finish} className="mt-5 w-full rounded-xl bg-navy text-navy-foreground font-bold p-3">
+          Submit quiz
+        </button>
+      )}
+      {submitted && (
         <div className="mt-5 rounded-xl bg-gold-gradient text-gold-foreground font-bold p-4 text-center">
-          You finished the quiz! Final score: {score} / {questions.length} {score === questions.length ? "— Perfect! 🌟" : score >= quiz.pass_score ? "— Well done! 👏" : "— Keep practising, you've got this! 💪"}
+          You finished the quiz! Final score: {submitted.score} / {submitted.total} {submitted.score === submitted.total ? "— Perfect! 🌟" : submitted.score >= quiz.pass_score ? "— Well done! 👏" : "— Keep practising, you've got this! 💪"}
         </div>
       )}
     </div>

@@ -74,6 +74,7 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        setPendingEmail(form.email);
         toast.success("Account created! Check your email to confirm.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
@@ -82,6 +83,87 @@ function AuthPage() {
       }
     } catch (err: any) {
       toast.error(err?.message || "Authentication failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function resend() {
+    if (!pendingEmail) return;
+    setBusy(true);
+    try {
+      const productionOrigin = "https://craddle-learn-nigeria.lovable.app";
+      const isLocalDev =
+        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+      const redirectBase = isLocalDev ? window.location.origin : productionOrigin;
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: pendingEmail,
+        options: { emailRedirectTo: `${redirectBase}/auth/callback` },
+      });
+      if (error) throw error;
+      toast.success("Verification email sent again");
+    } catch (err: any) {
+      toast.error(err?.message || "Could not resend the email");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Lets the learner finish verification by pasting the link (or the 6-digit
+  // code) from the email — useful on Android Gmail, which can suppress taps on
+  // links from shared senders.
+  async function verifyPasted() {
+    const value = pasted.trim();
+    if (!value) return toast.error("Paste the link or code from your email first");
+    setBusy(true);
+    try {
+      if (/^https?:\/\//i.test(value)) {
+        const url = new URL(value);
+        const params = new URLSearchParams(url.search);
+        const hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
+        const get = (k: string) => params.get(k) ?? hashParams.get(k);
+
+        const tokenHash = get("token_hash");
+        const code = get("code");
+        const token = get("token");
+        const type = (get("type") || "signup") as "signup" | "email" | "recovery" | "magiclink";
+
+        if (tokenHash) {
+          const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+          if (error) throw error;
+        } else if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (token) {
+          const { error } = await supabase.auth.verifyOtp({
+            token,
+            type: type === "recovery" ? "recovery" : "signup",
+            email: pendingEmail || form.email,
+          });
+          if (error) throw error;
+        } else {
+          // A tracking/redirect link we can't decode here — open it directly.
+          window.open(value, "_blank", "noopener");
+          toast.message("Opening the verification link in a new tab…");
+          return;
+        }
+      } else {
+        const codeOnly = value.replace(/\s+/g, "");
+        if (!/^\d{6}$/.test(codeOnly)) throw new Error("That doesn't look like a valid link or 6-digit code");
+        const { error } = await supabase.auth.verifyOtp({
+          email: pendingEmail || form.email,
+          token: codeOnly,
+          type: "signup",
+        });
+        if (error) throw error;
+      }
+
+      toast.success("Email confirmed! Signing you in…");
+      const { data } = await supabase.auth.getUser();
+      if (data.user) navigate({ to: "/student" });
+    } catch (err: any) {
+      toast.error(err?.message || "Could not verify with that link or code");
     } finally {
       setBusy(false);
     }
@@ -125,6 +207,45 @@ function AuthPage() {
               {busy && <Loader2 className="h-4 w-4 animate-spin" />} {mode === "signup" ? "Create account" : "Sign in"}
             </button>
           </form>
+
+          <div className="mt-6 rounded-xl border border-border bg-muted/40 p-4">
+            <div className="flex items-center gap-2 text-navy">
+              <MailCheck className="h-4 w-4 text-gold" />
+              <span className="text-sm font-semibold">Trouble with the “Verify Email” button?</span>
+            </div>
+            <ol className="mt-2 space-y-1 text-xs text-muted-foreground list-decimal pl-4">
+              <li>Open the email and <strong>long-press</strong> the “Verify Email” button.</li>
+              <li>Tap <strong>Copy link address</strong> (or “Open link”).</li>
+              <li>Paste it below and tap <strong>Verify now</strong>.</li>
+            </ol>
+            <textarea
+              value={pasted}
+              onChange={(e) => setPasted(e.target.value)}
+              rows={2}
+              placeholder="Paste the verification link or 6-digit code"
+              className="mt-3 w-full rounded-md border border-input bg-background px-3 py-2 text-xs"
+            />
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={verifyPasted}
+                disabled={busy}
+                className="flex-1 min-w-[8rem] rounded-md bg-navy text-navy-foreground text-xs font-semibold py-2 disabled:opacity-60 inline-flex items-center justify-center gap-2"
+              >
+                {busy && <Loader2 className="h-3 w-3 animate-spin" />} Verify now
+              </button>
+              <button
+                type="button"
+                onClick={resend}
+                disabled={busy || !(pendingEmail || form.email)}
+                onMouseDown={() => { if (!pendingEmail && form.email) setPendingEmail(form.email); }}
+                className="rounded-md border border-border bg-background text-xs font-semibold px-3 py-2 disabled:opacity-60"
+              >
+                Resend email
+              </button>
+            </div>
+          </div>
+
           <p className="mt-6 text-center text-xs text-muted-foreground">
             By continuing you agree to our terms and privacy policy.
           </p>
@@ -133,6 +254,7 @@ function AuthPage() {
     </div>
   );
 }
+
 
 function Field({ label, value, onChange, type = "text" }: { label: string; value: string; onChange: (v: string) => void; type?: string }) {
   return (

@@ -90,86 +90,8 @@ function AuthPage() {
     }
   }
 
-  async function resend() {
-    if (!pendingEmail) return;
-    setBusy(true);
-    try {
-      const productionOrigin = "https://craddle-learn-nigeria.lovable.app";
-      const isLocalDev =
-        window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-      const redirectBase = isLocalDev ? window.location.origin : productionOrigin;
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: pendingEmail,
-        options: { emailRedirectTo: `${redirectBase}/auth/callback` },
-      });
-      if (error) throw error;
-      toast.success("Verification email sent again");
-    } catch (err: any) {
-      toast.error(err?.message || "Could not resend the email");
-    } finally {
-      setBusy(false);
-    }
-  }
 
-  // Lets the learner finish verification by pasting the link (or the 6-digit
-  // code) from the email — useful on Android Gmail, which can suppress taps on
-  // links from shared senders.
-  async function verifyPasted() {
-    const value = pasted.trim();
-    if (!value) return toast.error("Paste the link or code from your email first");
-    setBusy(true);
-    try {
-      if (/^https?:\/\//i.test(value)) {
-        const url = new URL(value);
-        const params = new URLSearchParams(url.search);
-        const hashParams = new URLSearchParams(url.hash.replace(/^#/, ""));
-        const get = (k: string) => params.get(k) ?? hashParams.get(k);
 
-        const tokenHash = get("token_hash");
-        const code = get("code");
-        const token = get("token");
-        const type = (get("type") || "signup") as "signup" | "email" | "recovery" | "magiclink";
-
-        if (tokenHash) {
-          const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
-          if (error) throw error;
-        } else if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if (error) throw error;
-        } else if (token) {
-          const { error } = await supabase.auth.verifyOtp({
-            token,
-            type: type === "recovery" ? "recovery" : "signup",
-            email: pendingEmail || form.email,
-          });
-          if (error) throw error;
-        } else {
-          // A tracking/redirect link we can't decode here — open it directly.
-          window.open(value, "_blank", "noopener");
-          toast.message("Opening the verification link in a new tab…");
-          return;
-        }
-      } else {
-        const codeOnly = value.replace(/\s+/g, "");
-        if (!/^\d{6}$/.test(codeOnly)) throw new Error("That doesn't look like a valid link or 6-digit code");
-        const { error } = await supabase.auth.verifyOtp({
-          email: pendingEmail || form.email,
-          token: codeOnly,
-          type: "signup",
-        });
-        if (error) throw error;
-      }
-
-      toast.success("Email confirmed! Signing you in…");
-      const { data } = await supabase.auth.getUser();
-      if (data.user) navigate({ to: "/student" });
-    } catch (err: any) {
-      toast.error(err?.message || "Could not verify with that link or code");
-    } finally {
-      setBusy(false);
-    }
-  }
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2 bg-cream">

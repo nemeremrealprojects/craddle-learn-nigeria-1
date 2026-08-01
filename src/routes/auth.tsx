@@ -25,8 +25,6 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [form, setForm] = useState({ email: "", password: "", full_name: "", phone: "" });
   const [busy, setBusy] = useState(false);
-  const [pendingEmail, setPendingEmail] = useState("");
-  const [pasted, setPasted] = useState("");
 
   useEffect(() => {
     if (authLoading || !user) return;

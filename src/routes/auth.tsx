@@ -210,43 +210,10 @@ function AuthPage() {
             </button>
           </form>
 
-          <div className="mt-6 rounded-xl border border-border bg-muted/40 p-4">
-            <div className="flex items-center gap-2 text-navy">
-              <MailCheck className="h-4 w-4 text-gold" />
-              <span className="text-sm font-semibold">Trouble with the “Verify Email” button?</span>
-            </div>
-            <ol className="mt-2 space-y-1 text-xs text-muted-foreground list-decimal pl-4">
-              <li>Open the email and <strong>long-press</strong> the “Verify Email” button.</li>
-              <li>Tap <strong>Copy link address</strong> (or “Open link”).</li>
-              <li>Paste it below and tap <strong>Verify now</strong>.</li>
-            </ol>
-            <textarea
-              value={pasted}
-              onChange={(e) => setPasted(e.target.value)}
-              rows={2}
-              placeholder="Paste the verification link or 6-digit code"
-              className="mt-3 w-full rounded-md border border-input bg-background px-3 py-2 text-xs"
-            />
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={verifyPasted}
-                disabled={busy}
-                className="flex-1 min-w-[8rem] rounded-md bg-navy text-navy-foreground text-xs font-semibold py-2 disabled:opacity-60 inline-flex items-center justify-center gap-2"
-              >
-                {busy && <Loader2 className="h-3 w-3 animate-spin" />} Verify now
-              </button>
-              <button
-                type="button"
-                onClick={resend}
-                disabled={busy || !(pendingEmail || form.email)}
-                onMouseDown={() => { if (!pendingEmail && form.email) setPendingEmail(form.email); }}
-                className="rounded-md border border-border bg-background text-xs font-semibold px-3 py-2 disabled:opacity-60"
-              >
-                Resend email
-              </button>
-            </div>
-          </div>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            No email verification needed — creating an account signs you in right away.
+          </p>
+
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             By continuing you agree to our terms and privacy policy.

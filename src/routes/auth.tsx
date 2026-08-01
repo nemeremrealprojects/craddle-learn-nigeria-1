@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2, GraduationCap } from "lucide-react";
+import { Loader2, GraduationCap, MailCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, primaryRole } from "@/lib/auth-context";
 import { Link as LinkIcon } from "lucide-react";

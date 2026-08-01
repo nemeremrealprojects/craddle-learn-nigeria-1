@@ -59,25 +59,21 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
-        // Always send confirmation links to the stable production URL so
-        // links don't break when preview URLs change, and Gmail is less
-        // likely to flag them as suspicious.
-        const productionOrigin = "https://craddle-learn-nigeria.lovable.app";
-        const isLocalDev =
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1";
-        const redirectBase = isLocalDev ? window.location.origin : productionOrigin;
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: form.email,
           password: form.password,
-          options: {
-            emailRedirectTo: `${redirectBase}/auth/callback`,
-            data: { full_name: form.full_name, phone: form.phone },
-          },
+          options: { data: { full_name: form.full_name, phone: form.phone } },
         });
         if (error) throw error;
-        setPendingEmail(form.email);
-        toast.success("Account created! Check your email to confirm.");
+        if (!data.session) {
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: form.email,
+            password: form.password,
+          });
+          if (signInError) throw signInError;
+        }
+        toast.success("Account created! You're signed in.");
+
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
         if (error) throw error;

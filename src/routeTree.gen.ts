@@ -26,6 +26,7 @@ import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authent
 import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenticated/parent/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
+import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
 import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
 
 const SummerRoute = SummerRouteImport.update({
@@ -116,6 +117,12 @@ const ApiPublicPaystackWebhookRoute =
     path: '/api/public/paystack-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedAdminVideosRoute =
+  AuthenticatedAdminVideosRouteImport.update({
+    id: '/admin/videos',
+    path: '/admin/videos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentCoursesSlugRoute =
   AuthenticatedStudentCoursesSlugRouteImport.update({
     id: '/student/courses/$slug',
@@ -135,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/courses/$slug': typeof CoursesSlugRoute
   '/payment/callback': typeof PaymentCallbackRoute
   '/courses/': typeof CoursesIndexRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/parent/': typeof AuthenticatedParentIndexRoute
@@ -154,6 +162,7 @@ export interface FileRoutesByTo {
   '/courses/$slug': typeof CoursesSlugRoute
   '/payment/callback': typeof PaymentCallbackRoute
   '/courses': typeof CoursesIndexRoute
+  '/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/parent': typeof AuthenticatedParentIndexRoute
@@ -175,6 +184,7 @@ export interface FileRoutesById {
   '/courses/$slug': typeof CoursesSlugRoute
   '/payment/callback': typeof PaymentCallbackRoute
   '/courses/': typeof CoursesIndexRoute
+  '/_authenticated/admin/videos': typeof AuthenticatedAdminVideosRoute
   '/api/public/paystack-webhook': typeof ApiPublicPaystackWebhookRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/parent/': typeof AuthenticatedParentIndexRoute
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/courses/$slug'
     | '/payment/callback'
     | '/courses/'
+    | '/admin/videos'
     | '/api/public/paystack-webhook'
     | '/admin/'
     | '/parent/'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/courses/$slug'
     | '/payment/callback'
     | '/courses'
+    | '/admin/videos'
     | '/api/public/paystack-webhook'
     | '/admin'
     | '/parent'
@@ -235,6 +247,7 @@ export interface FileRouteTypes {
     | '/courses/$slug'
     | '/payment/callback'
     | '/courses/'
+    | '/_authenticated/admin/videos'
     | '/api/public/paystack-webhook'
     | '/_authenticated/admin/'
     | '/_authenticated/parent/'
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaystackWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin/videos': {
+      id: '/_authenticated/admin/videos'
+      path: '/admin/videos'
+      fullPath: '/admin/videos'
+      preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/courses/$slug': {
       id: '/_authenticated/student/courses/$slug'
       path: '/student/courses/$slug'
@@ -390,6 +410,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminVideosRoute: typeof AuthenticatedAdminVideosRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedParentIndexRoute: typeof AuthenticatedParentIndexRoute
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
@@ -398,6 +419,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminVideosRoute: AuthenticatedAdminVideosRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedParentIndexRoute: AuthenticatedParentIndexRoute,
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,

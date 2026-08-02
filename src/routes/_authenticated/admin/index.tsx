@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
@@ -46,7 +46,15 @@ function AdminDashboard() {
     <div className="min-h-screen flex flex-col bg-cream">
       <Header />
       <section className="mx-auto max-w-7xl w-full px-4 py-10 flex-1">
-        <h1 className="font-display text-3xl md:text-4xl font-bold text-navy">Admin dashboard</h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-navy">Admin dashboard</h1>
+          <Link
+            to="/admin/videos"
+            className="rounded-lg bg-gold-gradient text-gold-foreground font-bold px-5 py-2.5 shadow-gold hover:opacity-95"
+          >
+            Course Videos
+          </Link>
+        </div>
 
         <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard Icon={Users} label="Users" value={s?.users ?? "—"} />

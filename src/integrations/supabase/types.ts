@@ -285,7 +285,9 @@ export type Database = {
           description: string | null
           duration_seconds: number | null
           id: string
+          published: boolean
           sort_order: number
+          thumbnail_url: string | null
           title: string
           video_url: string | null
         }
@@ -295,7 +297,9 @@ export type Database = {
           description?: string | null
           duration_seconds?: number | null
           id?: string
+          published?: boolean
           sort_order?: number
+          thumbnail_url?: string | null
           title: string
           video_url?: string | null
         }
@@ -305,7 +309,9 @@ export type Database = {
           description?: string | null
           duration_seconds?: number | null
           id?: string
+          published?: boolean
           sort_order?: number
+          thumbnail_url?: string | null
           title?: string
           video_url?: string | null
         }

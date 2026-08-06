@@ -50,12 +50,13 @@ function AuthCallback() {
         if (data.user) {
           navigate({ to: "/student" });
         } else {
-          navigate({ to: "/auth" });
+          navigate({ to: "/auth", search: { redirect: "" } });
         }
       } catch (err: any) {
         toast.error(err?.message || "Could not confirm email");
         setMessage("We couldn't confirm your email. Please try signing in again.");
-        setTimeout(() => navigate({ to: "/auth" }), 2000);
+        setTimeout(() => navigate({ to: "/auth", search: { redirect: "" } }), 2000);
+
       }
     })();
   }, [navigate]);

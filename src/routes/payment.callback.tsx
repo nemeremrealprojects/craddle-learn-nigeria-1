@@ -5,6 +5,8 @@ import { verifyPayment } from "@/lib/payments.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SUMMER_ENGLISH_SLUG } from "@/lib/summer-english";
+
 
 export const Route = createFileRoute("/payment/callback")({
   validateSearch: (s: Record<string, unknown>) => ({
@@ -26,12 +28,19 @@ function PaymentCallback() {
     if (!reference) { setState("error"); setMessage("Missing payment reference."); return; }
     verify({ data: { reference } })
       .then((r) => {
-        if (r.status === "success") { setState("success"); setSlug(r.slug ?? null); }
+        if (r.status === "success") {
+          setState("success");
+          setSlug(r.slug ?? null);
+          if (r.slug === SUMMER_ENGLISH_SLUG) {
+            navigate({ to: "/student/summer-english", replace: true });
+          }
+        }
         else if (r.status === "failed") { setState("failed"); setMessage(r.message ?? "Payment failed"); }
         else { setState("error"); setMessage(r.message ?? "Verification error"); }
       })
       .catch((e) => { setState("error"); setMessage(e?.message ?? "Could not verify"); });
-  }, [reference, verify]);
+  }, [reference, verify, navigate]);
+
 
   return (
     <div className="min-h-screen flex flex-col">

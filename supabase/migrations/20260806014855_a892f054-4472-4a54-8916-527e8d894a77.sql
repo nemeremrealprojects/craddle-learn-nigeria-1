@@ -1,0 +1,10 @@
+ALTER TABLE public.quizzes ADD COLUMN IF NOT EXISTS lesson_id uuid REFERENCES public.lessons(id) ON DELETE CASCADE;
+ALTER TABLE public.assignments ADD COLUMN IF NOT EXISTS lesson_id uuid REFERENCES public.lessons(id) ON DELETE CASCADE;
+ALTER TABLE public.materials ADD COLUMN IF NOT EXISTS lesson_id uuid REFERENCES public.lessons(id) ON DELETE CASCADE;
+ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS notes text;
+ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS objectives text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS vocabulary text[] NOT NULL DEFAULT '{}';
+ALTER TABLE public.lessons ADD COLUMN IF NOT EXISTS module_title text;
+CREATE INDEX IF NOT EXISTS quizzes_lesson_id_idx ON public.quizzes(lesson_id);
+CREATE INDEX IF NOT EXISTS assignments_lesson_id_idx ON public.assignments(lesson_id);
+CREATE INDEX IF NOT EXISTS materials_lesson_id_idx ON public.materials(lesson_id);

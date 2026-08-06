@@ -87,6 +87,7 @@ export type Database = {
           due_date: string | null
           id: string
           instructions: string | null
+          lesson_id: string | null
           max_score: number
           title: string
         }
@@ -96,6 +97,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           instructions?: string | null
+          lesson_id?: string | null
           max_score?: number
           title: string
         }
@@ -105,6 +107,7 @@ export type Database = {
           due_date?: string | null
           id?: string
           instructions?: string | null
+          lesson_id?: string | null
           max_score?: number
           title?: string
         }
@@ -114,6 +117,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "assignments_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
         ]
@@ -285,11 +295,15 @@ export type Database = {
           description: string | null
           duration_seconds: number | null
           id: string
+          module_title: string | null
+          notes: string | null
+          objectives: string[]
           published: boolean
           sort_order: number
           thumbnail_url: string | null
           title: string
           video_url: string | null
+          vocabulary: string[]
         }
         Insert: {
           course_id: string
@@ -297,11 +311,15 @@ export type Database = {
           description?: string | null
           duration_seconds?: number | null
           id?: string
+          module_title?: string | null
+          notes?: string | null
+          objectives?: string[]
           published?: boolean
           sort_order?: number
           thumbnail_url?: string | null
           title: string
           video_url?: string | null
+          vocabulary?: string[]
         }
         Update: {
           course_id?: string
@@ -309,11 +327,15 @@ export type Database = {
           description?: string | null
           duration_seconds?: number | null
           id?: string
+          module_title?: string | null
+          notes?: string | null
+          objectives?: string[]
           published?: boolean
           sort_order?: number
           thumbnail_url?: string | null
           title?: string
           video_url?: string | null
+          vocabulary?: string[]
         }
         Relationships: [
           {
@@ -332,6 +354,7 @@ export type Database = {
           description: string | null
           file_url: string
           id: string
+          lesson_id: string | null
           material_type: string
           sort_order: number
           title: string
@@ -342,6 +365,7 @@ export type Database = {
           description?: string | null
           file_url: string
           id?: string
+          lesson_id?: string | null
           material_type?: string
           sort_order?: number
           title: string
@@ -352,6 +376,7 @@ export type Database = {
           description?: string | null
           file_url?: string
           id?: string
+          lesson_id?: string | null
           material_type?: string
           sort_order?: number
           title?: string
@@ -362,6 +387,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materials_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
         ]
@@ -537,6 +569,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          lesson_id: string | null
           pass_score: number
           title: string
         }
@@ -545,6 +578,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          lesson_id?: string | null
           pass_score?: number
           title: string
         }
@@ -553,6 +587,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          lesson_id?: string | null
           pass_score?: number
           title?: string
         }
@@ -562,6 +597,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quizzes_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
             referencedColumns: ["id"]
           },
         ]

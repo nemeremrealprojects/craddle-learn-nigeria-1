@@ -27,6 +27,7 @@ import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
+import { Route as AuthenticatedStudentSummerEnglishIndexRouteImport } from './routes/_authenticated/student/summer-english/index'
 import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
 
 const SummerRoute = SummerRouteImport.update({
@@ -123,6 +124,12 @@ const AuthenticatedAdminVideosRoute =
     path: '/admin/videos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentSummerEnglishIndexRoute =
+  AuthenticatedStudentSummerEnglishIndexRouteImport.update({
+    id: '/student/summer-english/',
+    path: '/student/summer-english/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentCoursesSlugRoute =
   AuthenticatedStudentCoursesSlugRouteImport.update({
     id: '/student/courses/$slug',
@@ -149,6 +156,7 @@ export interface FileRoutesByFullPath {
   '/student/': typeof AuthenticatedStudentIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
+  '/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -169,6 +177,7 @@ export interface FileRoutesByTo {
   '/student': typeof AuthenticatedStudentIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
+  '/student/summer-english': typeof AuthenticatedStudentSummerEnglishIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -191,6 +200,7 @@ export interface FileRoutesById {
   '/_authenticated/student/': typeof AuthenticatedStudentIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
+  '/_authenticated/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/student/'
     | '/teacher/'
     | '/student/courses/$slug'
+    | '/student/summer-english/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/student/courses/$slug'
+    | '/student/summer-english'
   id:
     | '__root__'
     | '/'
@@ -254,6 +266,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/'
     | '/_authenticated/teacher/'
     | '/_authenticated/student/courses/$slug'
+    | '/_authenticated/student/summer-english/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -399,6 +412,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/summer-english/': {
+      id: '/_authenticated/student/summer-english/'
+      path: '/student/summer-english'
+      fullPath: '/student/summer-english/'
+      preLoaderRoute: typeof AuthenticatedStudentSummerEnglishIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/courses/$slug': {
       id: '/_authenticated/student/courses/$slug'
       path: '/student/courses/$slug'
@@ -416,6 +436,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedStudentCoursesSlugRoute: typeof AuthenticatedStudentCoursesSlugRoute
+  AuthenticatedStudentSummerEnglishIndexRoute: typeof AuthenticatedStudentSummerEnglishIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -425,6 +446,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
   AuthenticatedStudentCoursesSlugRoute: AuthenticatedStudentCoursesSlugRoute,
+  AuthenticatedStudentSummerEnglishIndexRoute:
+    AuthenticatedStudentSummerEnglishIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

@@ -5,6 +5,8 @@ import { verifyPayment } from "@/lib/payments.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SUMMER_ENGLISH_SLUG } from "@/lib/summer-english";
+
 
 export const Route = createFileRoute("/payment/callback")({
   validateSearch: (s: Record<string, unknown>) => ({

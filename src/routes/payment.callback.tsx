@@ -33,7 +33,10 @@ function PaymentCallback() {
           setSlug(r.slug ?? null);
           if (r.slug === SUMMER_ENGLISH_SLUG) {
             navigate({ to: "/student/summer-english", replace: true });
+          } else if (r.slug === SUMMER_MATHS_SLUG) {
+            navigate({ to: "/student/summer-mathematics", replace: true });
           }
+
         }
         else if (r.status === "failed") { setState("failed"); setMessage(r.message ?? "Payment failed"); }
         else { setState("error"); setMessage(r.message ?? "Verification error"); }

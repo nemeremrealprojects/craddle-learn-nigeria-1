@@ -27,6 +27,7 @@ import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
+import { Route as AuthenticatedStudentSummerMathematicsIndexRouteImport } from './routes/_authenticated/student/summer-mathematics/index'
 import { Route as AuthenticatedStudentSummerEnglishIndexRouteImport } from './routes/_authenticated/student/summer-english/index'
 import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
 import { Route as AuthenticatedStudentSummerEnglishLessonOrderRouteImport } from './routes/_authenticated/student/summer-english/lesson.$order'
@@ -125,6 +126,12 @@ const AuthenticatedAdminVideosRoute =
     path: '/admin/videos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentSummerMathematicsIndexRoute =
+  AuthenticatedStudentSummerMathematicsIndexRouteImport.update({
+    id: '/student/summer-mathematics/',
+    path: '/student/summer-mathematics/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentSummerEnglishIndexRoute =
   AuthenticatedStudentSummerEnglishIndexRouteImport.update({
     id: '/student/summer-english/',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
   '/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
+  '/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
 }
 export interface FileRoutesByTo {
@@ -186,6 +194,7 @@ export interface FileRoutesByTo {
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
   '/student/summer-english': typeof AuthenticatedStudentSummerEnglishIndexRoute
+  '/student/summer-mathematics': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
 }
 export interface FileRoutesById {
@@ -210,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
   '/_authenticated/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
+  '/_authenticated/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/_authenticated/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
 }
 export interface FileRouteTypes {
@@ -234,6 +244,7 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/student/courses/$slug'
     | '/student/summer-english/'
+    | '/student/summer-mathematics/'
     | '/student/summer-english/lesson/$order'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/student/courses/$slug'
     | '/student/summer-english'
+    | '/student/summer-mathematics'
     | '/student/summer-english/lesson/$order'
   id:
     | '__root__'
@@ -279,6 +291,7 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/'
     | '/_authenticated/student/courses/$slug'
     | '/_authenticated/student/summer-english/'
+    | '/_authenticated/student/summer-mathematics/'
     | '/_authenticated/student/summer-english/lesson/$order'
   fileRoutesById: FileRoutesById
 }
@@ -425,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/summer-mathematics/': {
+      id: '/_authenticated/student/summer-mathematics/'
+      path: '/student/summer-mathematics'
+      fullPath: '/student/summer-mathematics/'
+      preLoaderRoute: typeof AuthenticatedStudentSummerMathematicsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/summer-english/': {
       id: '/_authenticated/student/summer-english/'
       path: '/student/summer-english'
@@ -457,6 +477,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedStudentCoursesSlugRoute: typeof AuthenticatedStudentCoursesSlugRoute
   AuthenticatedStudentSummerEnglishIndexRoute: typeof AuthenticatedStudentSummerEnglishIndexRoute
+  AuthenticatedStudentSummerMathematicsIndexRoute: typeof AuthenticatedStudentSummerMathematicsIndexRoute
   AuthenticatedStudentSummerEnglishLessonOrderRoute: typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
 }
 
@@ -469,6 +490,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedStudentCoursesSlugRoute: AuthenticatedStudentCoursesSlugRoute,
   AuthenticatedStudentSummerEnglishIndexRoute:
     AuthenticatedStudentSummerEnglishIndexRoute,
+  AuthenticatedStudentSummerMathematicsIndexRoute:
+    AuthenticatedStudentSummerMathematicsIndexRoute,
   AuthenticatedStudentSummerEnglishLessonOrderRoute:
     AuthenticatedStudentSummerEnglishLessonOrderRoute,
 }
@@ -504,13 +527,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

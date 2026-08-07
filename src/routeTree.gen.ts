@@ -27,8 +27,10 @@ import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenti
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
+import { Route as AuthenticatedStudentSummerMathematicsIndexRouteImport } from './routes/_authenticated/student/summer-mathematics/index'
 import { Route as AuthenticatedStudentSummerEnglishIndexRouteImport } from './routes/_authenticated/student/summer-english/index'
 import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
+import { Route as AuthenticatedStudentSummerMathematicsLessonOrderRouteImport } from './routes/_authenticated/student/summer-mathematics/lesson.$order'
 import { Route as AuthenticatedStudentSummerEnglishLessonOrderRouteImport } from './routes/_authenticated/student/summer-english/lesson.$order'
 
 const SummerRoute = SummerRouteImport.update({
@@ -125,6 +127,12 @@ const AuthenticatedAdminVideosRoute =
     path: '/admin/videos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentSummerMathematicsIndexRoute =
+  AuthenticatedStudentSummerMathematicsIndexRouteImport.update({
+    id: '/student/summer-mathematics/',
+    path: '/student/summer-mathematics/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentSummerEnglishIndexRoute =
   AuthenticatedStudentSummerEnglishIndexRouteImport.update({
     id: '/student/summer-english/',
@@ -135,6 +143,12 @@ const AuthenticatedStudentCoursesSlugRoute =
   AuthenticatedStudentCoursesSlugRouteImport.update({
     id: '/student/courses/$slug',
     path: '/student/courses/$slug',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentSummerMathematicsLessonOrderRoute =
+  AuthenticatedStudentSummerMathematicsLessonOrderRouteImport.update({
+    id: '/student/summer-mathematics/lesson/$order',
+    path: '/student/summer-mathematics/lesson/$order',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedStudentSummerEnglishLessonOrderRoute =
@@ -164,7 +178,9 @@ export interface FileRoutesByFullPath {
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
   '/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
+  '/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  '/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -186,7 +202,9 @@ export interface FileRoutesByTo {
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
   '/student/summer-english': typeof AuthenticatedStudentSummerEnglishIndexRoute
+  '/student/summer-mathematics': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  '/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -210,7 +228,9 @@ export interface FileRoutesById {
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
   '/_authenticated/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
+  '/_authenticated/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/_authenticated/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  '/_authenticated/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -234,7 +254,9 @@ export interface FileRouteTypes {
     | '/teacher/'
     | '/student/courses/$slug'
     | '/student/summer-english/'
+    | '/student/summer-mathematics/'
     | '/student/summer-english/lesson/$order'
+    | '/student/summer-mathematics/lesson/$order'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -256,7 +278,9 @@ export interface FileRouteTypes {
     | '/teacher'
     | '/student/courses/$slug'
     | '/student/summer-english'
+    | '/student/summer-mathematics'
     | '/student/summer-english/lesson/$order'
+    | '/student/summer-mathematics/lesson/$order'
   id:
     | '__root__'
     | '/'
@@ -279,7 +303,9 @@ export interface FileRouteTypes {
     | '/_authenticated/teacher/'
     | '/_authenticated/student/courses/$slug'
     | '/_authenticated/student/summer-english/'
+    | '/_authenticated/student/summer-mathematics/'
     | '/_authenticated/student/summer-english/lesson/$order'
+    | '/_authenticated/student/summer-mathematics/lesson/$order'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -425,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/summer-mathematics/': {
+      id: '/_authenticated/student/summer-mathematics/'
+      path: '/student/summer-mathematics'
+      fullPath: '/student/summer-mathematics/'
+      preLoaderRoute: typeof AuthenticatedStudentSummerMathematicsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/summer-english/': {
       id: '/_authenticated/student/summer-english/'
       path: '/student/summer-english'
@@ -437,6 +470,13 @@ declare module '@tanstack/react-router' {
       path: '/student/courses/$slug'
       fullPath: '/student/courses/$slug'
       preLoaderRoute: typeof AuthenticatedStudentCoursesSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/summer-mathematics/lesson/$order': {
+      id: '/_authenticated/student/summer-mathematics/lesson/$order'
+      path: '/student/summer-mathematics/lesson/$order'
+      fullPath: '/student/summer-mathematics/lesson/$order'
+      preLoaderRoute: typeof AuthenticatedStudentSummerMathematicsLessonOrderRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/student/summer-english/lesson/$order': {
@@ -457,7 +497,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedStudentCoursesSlugRoute: typeof AuthenticatedStudentCoursesSlugRoute
   AuthenticatedStudentSummerEnglishIndexRoute: typeof AuthenticatedStudentSummerEnglishIndexRoute
+  AuthenticatedStudentSummerMathematicsIndexRoute: typeof AuthenticatedStudentSummerMathematicsIndexRoute
   AuthenticatedStudentSummerEnglishLessonOrderRoute: typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  AuthenticatedStudentSummerMathematicsLessonOrderRoute: typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -469,8 +511,12 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedStudentCoursesSlugRoute: AuthenticatedStudentCoursesSlugRoute,
   AuthenticatedStudentSummerEnglishIndexRoute:
     AuthenticatedStudentSummerEnglishIndexRoute,
+  AuthenticatedStudentSummerMathematicsIndexRoute:
+    AuthenticatedStudentSummerMathematicsIndexRoute,
   AuthenticatedStudentSummerEnglishLessonOrderRoute:
     AuthenticatedStudentSummerEnglishLessonOrderRoute,
+  AuthenticatedStudentSummerMathematicsLessonOrderRoute:
+    AuthenticatedStudentSummerMathematicsLessonOrderRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

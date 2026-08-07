@@ -24,20 +24,21 @@ export interface SummerProgressRow {
   updated_at: string;
 }
 
-export function useSummerCourse() {
+export function useSummerCourse(slug: string = SUMMER_ENGLISH_SLUG) {
   return useQuery({
-    queryKey: ["summer-course"],
+    queryKey: ["summer-course", slug],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data } = await supabase
         .from("courses")
         .select("id, title, slug, level, description, duration_weeks, image_url")
-        .eq("slug", SUMMER_ENGLISH_SLUG)
+        .eq("slug", slug)
         .maybeSingle();
       return data;
     },
   });
 }
+
 
 export function useSummerEnrollment(courseId?: string, userId?: string) {
   return useQuery({
@@ -90,9 +91,14 @@ export function useSummerProgress(courseId?: string, userId?: string) {
 }
 
 /** Aggregated course stats used by the dashboard. */
-export function summarise(lessons: SummerLesson[], progress: SummerProgressRow[]) {
+export function summarise(
+  lessons: SummerLesson[],
+  progress: SummerProgressRow[],
+  plannedLessons: number = SUMMER_ENGLISH_TOTAL_LESSONS,
+) {
   const completedIds = new Set(progress.filter((p) => p.completed).map((p) => p.lesson_id));
-  const totalPlanned = Math.max(SUMMER_ENGLISH_TOTAL_LESSONS, lessons.length);
+  const totalPlanned = Math.max(plannedLessons, lessons.length);
+
   const completedCount = completedIds.size;
   const remaining = Math.max(0, totalPlanned - completedCount);
   const percent = totalPlanned ? Math.round((completedCount / totalPlanned) * 100) : 0;

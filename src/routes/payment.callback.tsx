@@ -6,6 +6,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SUMMER_ENGLISH_SLUG } from "@/lib/summer-english";
+import { SUMMER_MATHS_SLUG } from "@/lib/summer-maths";
+
 
 
 export const Route = createFileRoute("/payment/callback")({
@@ -33,7 +35,10 @@ function PaymentCallback() {
           setSlug(r.slug ?? null);
           if (r.slug === SUMMER_ENGLISH_SLUG) {
             navigate({ to: "/student/summer-english", replace: true });
+          } else if (r.slug === SUMMER_MATHS_SLUG) {
+            navigate({ to: "/student/summer-mathematics", replace: true });
           }
+
         }
         else if (r.status === "failed") { setState("failed"); setMessage(r.message ?? "Payment failed"); }
         else { setState("error"); setMessage(r.message ?? "Verification error"); }

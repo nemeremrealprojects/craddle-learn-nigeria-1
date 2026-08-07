@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { SummerLearningCorner } from "@/components/site/SummerLearningCorner";
 import { formatNaira, CRF_CONTACT } from "@/lib/brand";
 import { BookOpen, Video, FileText, Award, Phone, ArrowRight, CheckCircle2, GraduationCap, Users } from "lucide-react";
 
@@ -194,6 +195,8 @@ function HomePage() {
           </div>
         </div>
       </section>
+
+      <SummerLearningCorner />
 
       <Footer />
     </div>

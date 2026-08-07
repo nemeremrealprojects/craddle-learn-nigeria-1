@@ -34,11 +34,17 @@ export function SummerLearningCorner() {
           observer.disconnect();
         }
       },
-      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" },
+      { threshold: 0.05 },
     );
 
     observer.observe(el);
     return () => observer.disconnect();
+  }, []);
+
+  // Fallback: ensure content is visible even if observers are blocked.
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   return (

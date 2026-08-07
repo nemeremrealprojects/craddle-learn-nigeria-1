@@ -30,6 +30,7 @@ import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenti
 import { Route as AuthenticatedStudentSummerMathematicsIndexRouteImport } from './routes/_authenticated/student/summer-mathematics/index'
 import { Route as AuthenticatedStudentSummerEnglishIndexRouteImport } from './routes/_authenticated/student/summer-english/index'
 import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
+import { Route as AuthenticatedStudentSummerMathematicsLessonOrderRouteImport } from './routes/_authenticated/student/summer-mathematics/lesson.$order'
 import { Route as AuthenticatedStudentSummerEnglishLessonOrderRouteImport } from './routes/_authenticated/student/summer-english/lesson.$order'
 
 const SummerRoute = SummerRouteImport.update({
@@ -144,6 +145,12 @@ const AuthenticatedStudentCoursesSlugRoute =
     path: '/student/courses/$slug',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentSummerMathematicsLessonOrderRoute =
+  AuthenticatedStudentSummerMathematicsLessonOrderRouteImport.update({
+    id: '/student/summer-mathematics/lesson/$order',
+    path: '/student/summer-mathematics/lesson/$order',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentSummerEnglishLessonOrderRoute =
   AuthenticatedStudentSummerEnglishLessonOrderRouteImport.update({
     id: '/student/summer-english/lesson/$order',
@@ -173,6 +180,7 @@ export interface FileRoutesByFullPath {
   '/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
   '/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  '/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -196,6 +204,7 @@ export interface FileRoutesByTo {
   '/student/summer-english': typeof AuthenticatedStudentSummerEnglishIndexRoute
   '/student/summer-mathematics': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  '/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -221,6 +230,7 @@ export interface FileRoutesById {
   '/_authenticated/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
   '/_authenticated/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
   '/_authenticated/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  '/_authenticated/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/student/summer-english/'
     | '/student/summer-mathematics/'
     | '/student/summer-english/lesson/$order'
+    | '/student/summer-mathematics/lesson/$order'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -269,6 +280,7 @@ export interface FileRouteTypes {
     | '/student/summer-english'
     | '/student/summer-mathematics'
     | '/student/summer-english/lesson/$order'
+    | '/student/summer-mathematics/lesson/$order'
   id:
     | '__root__'
     | '/'
@@ -293,6 +305,7 @@ export interface FileRouteTypes {
     | '/_authenticated/student/summer-english/'
     | '/_authenticated/student/summer-mathematics/'
     | '/_authenticated/student/summer-english/lesson/$order'
+    | '/_authenticated/student/summer-mathematics/lesson/$order'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -459,6 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentCoursesSlugRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/summer-mathematics/lesson/$order': {
+      id: '/_authenticated/student/summer-mathematics/lesson/$order'
+      path: '/student/summer-mathematics/lesson/$order'
+      fullPath: '/student/summer-mathematics/lesson/$order'
+      preLoaderRoute: typeof AuthenticatedStudentSummerMathematicsLessonOrderRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/summer-english/lesson/$order': {
       id: '/_authenticated/student/summer-english/lesson/$order'
       path: '/student/summer-english/lesson/$order'
@@ -479,6 +499,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedStudentSummerEnglishIndexRoute: typeof AuthenticatedStudentSummerEnglishIndexRoute
   AuthenticatedStudentSummerMathematicsIndexRoute: typeof AuthenticatedStudentSummerMathematicsIndexRoute
   AuthenticatedStudentSummerEnglishLessonOrderRoute: typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
+  AuthenticatedStudentSummerMathematicsLessonOrderRoute: typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -494,6 +515,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedStudentSummerMathematicsIndexRoute,
   AuthenticatedStudentSummerEnglishLessonOrderRoute:
     AuthenticatedStudentSummerEnglishLessonOrderRoute,
+  AuthenticatedStudentSummerMathematicsLessonOrderRoute:
+    AuthenticatedStudentSummerMathematicsLessonOrderRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

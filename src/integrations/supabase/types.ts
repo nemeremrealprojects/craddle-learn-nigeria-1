@@ -697,6 +697,7 @@ export type Database = {
           total: number
         }[]
       }
+      sync_my_enrollments: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "student" | "parent" | "teacher" | "admin"

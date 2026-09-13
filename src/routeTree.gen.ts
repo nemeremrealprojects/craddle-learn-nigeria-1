@@ -29,9 +29,11 @@ import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/publi
 import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
 import { Route as AuthenticatedStudentSummerMathematicsIndexRouteImport } from './routes/_authenticated/student/summer-mathematics/index'
 import { Route as AuthenticatedStudentSummerEnglishIndexRouteImport } from './routes/_authenticated/student/summer-english/index'
+import { Route as AuthenticatedStudentP6ReadingIndexRouteImport } from './routes/_authenticated/student/p6-reading/index'
 import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
 import { Route as AuthenticatedStudentSummerMathematicsLessonOrderRouteImport } from './routes/_authenticated/student/summer-mathematics/lesson.$order'
 import { Route as AuthenticatedStudentSummerEnglishLessonOrderRouteImport } from './routes/_authenticated/student/summer-english/lesson.$order'
+import { Route as AuthenticatedStudentP6ReadingLessonOrderRouteImport } from './routes/_authenticated/student/p6-reading/lesson.$order'
 
 const SummerRoute = SummerRouteImport.update({
   id: '/summer',
@@ -139,6 +141,12 @@ const AuthenticatedStudentSummerEnglishIndexRoute =
     path: '/student/summer-english/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedStudentP6ReadingIndexRoute =
+  AuthenticatedStudentP6ReadingIndexRouteImport.update({
+    id: '/student/p6-reading/',
+    path: '/student/p6-reading/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedStudentCoursesSlugRoute =
   AuthenticatedStudentCoursesSlugRouteImport.update({
     id: '/student/courses/$slug',
@@ -155,6 +163,12 @@ const AuthenticatedStudentSummerEnglishLessonOrderRoute =
   AuthenticatedStudentSummerEnglishLessonOrderRouteImport.update({
     id: '/student/summer-english/lesson/$order',
     path: '/student/summer-english/lesson/$order',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentP6ReadingLessonOrderRoute =
+  AuthenticatedStudentP6ReadingLessonOrderRouteImport.update({
+    id: '/student/p6-reading/lesson/$order',
+    path: '/student/p6-reading/lesson/$order',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -177,8 +191,10 @@ export interface FileRoutesByFullPath {
   '/student/': typeof AuthenticatedStudentIndexRoute
   '/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
+  '/student/p6-reading/': typeof AuthenticatedStudentP6ReadingIndexRoute
   '/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
   '/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
+  '/student/p6-reading/lesson/$order': typeof AuthenticatedStudentP6ReadingLessonOrderRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
   '/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
@@ -201,8 +217,10 @@ export interface FileRoutesByTo {
   '/student': typeof AuthenticatedStudentIndexRoute
   '/teacher': typeof AuthenticatedTeacherIndexRoute
   '/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
+  '/student/p6-reading': typeof AuthenticatedStudentP6ReadingIndexRoute
   '/student/summer-english': typeof AuthenticatedStudentSummerEnglishIndexRoute
   '/student/summer-mathematics': typeof AuthenticatedStudentSummerMathematicsIndexRoute
+  '/student/p6-reading/lesson/$order': typeof AuthenticatedStudentP6ReadingLessonOrderRoute
   '/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
   '/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
@@ -227,8 +245,10 @@ export interface FileRoutesById {
   '/_authenticated/student/': typeof AuthenticatedStudentIndexRoute
   '/_authenticated/teacher/': typeof AuthenticatedTeacherIndexRoute
   '/_authenticated/student/courses/$slug': typeof AuthenticatedStudentCoursesSlugRoute
+  '/_authenticated/student/p6-reading/': typeof AuthenticatedStudentP6ReadingIndexRoute
   '/_authenticated/student/summer-english/': typeof AuthenticatedStudentSummerEnglishIndexRoute
   '/_authenticated/student/summer-mathematics/': typeof AuthenticatedStudentSummerMathematicsIndexRoute
+  '/_authenticated/student/p6-reading/lesson/$order': typeof AuthenticatedStudentP6ReadingLessonOrderRoute
   '/_authenticated/student/summer-english/lesson/$order': typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
   '/_authenticated/student/summer-mathematics/lesson/$order': typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
@@ -253,8 +273,10 @@ export interface FileRouteTypes {
     | '/student/'
     | '/teacher/'
     | '/student/courses/$slug'
+    | '/student/p6-reading/'
     | '/student/summer-english/'
     | '/student/summer-mathematics/'
+    | '/student/p6-reading/lesson/$order'
     | '/student/summer-english/lesson/$order'
     | '/student/summer-mathematics/lesson/$order'
   fileRoutesByTo: FileRoutesByTo
@@ -277,8 +299,10 @@ export interface FileRouteTypes {
     | '/student'
     | '/teacher'
     | '/student/courses/$slug'
+    | '/student/p6-reading'
     | '/student/summer-english'
     | '/student/summer-mathematics'
+    | '/student/p6-reading/lesson/$order'
     | '/student/summer-english/lesson/$order'
     | '/student/summer-mathematics/lesson/$order'
   id:
@@ -302,8 +326,10 @@ export interface FileRouteTypes {
     | '/_authenticated/student/'
     | '/_authenticated/teacher/'
     | '/_authenticated/student/courses/$slug'
+    | '/_authenticated/student/p6-reading/'
     | '/_authenticated/student/summer-english/'
     | '/_authenticated/student/summer-mathematics/'
+    | '/_authenticated/student/p6-reading/lesson/$order'
     | '/_authenticated/student/summer-english/lesson/$order'
     | '/_authenticated/student/summer-mathematics/lesson/$order'
   fileRoutesById: FileRoutesById
@@ -465,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentSummerEnglishIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/p6-reading/': {
+      id: '/_authenticated/student/p6-reading/'
+      path: '/student/p6-reading'
+      fullPath: '/student/p6-reading/'
+      preLoaderRoute: typeof AuthenticatedStudentP6ReadingIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/student/courses/$slug': {
       id: '/_authenticated/student/courses/$slug'
       path: '/student/courses/$slug'
@@ -486,6 +519,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentSummerEnglishLessonOrderRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/student/p6-reading/lesson/$order': {
+      id: '/_authenticated/student/p6-reading/lesson/$order'
+      path: '/student/p6-reading/lesson/$order'
+      fullPath: '/student/p6-reading/lesson/$order'
+      preLoaderRoute: typeof AuthenticatedStudentP6ReadingLessonOrderRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
@@ -496,8 +536,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedStudentIndexRoute: typeof AuthenticatedStudentIndexRoute
   AuthenticatedTeacherIndexRoute: typeof AuthenticatedTeacherIndexRoute
   AuthenticatedStudentCoursesSlugRoute: typeof AuthenticatedStudentCoursesSlugRoute
+  AuthenticatedStudentP6ReadingIndexRoute: typeof AuthenticatedStudentP6ReadingIndexRoute
   AuthenticatedStudentSummerEnglishIndexRoute: typeof AuthenticatedStudentSummerEnglishIndexRoute
   AuthenticatedStudentSummerMathematicsIndexRoute: typeof AuthenticatedStudentSummerMathematicsIndexRoute
+  AuthenticatedStudentP6ReadingLessonOrderRoute: typeof AuthenticatedStudentP6ReadingLessonOrderRoute
   AuthenticatedStudentSummerEnglishLessonOrderRoute: typeof AuthenticatedStudentSummerEnglishLessonOrderRoute
   AuthenticatedStudentSummerMathematicsLessonOrderRoute: typeof AuthenticatedStudentSummerMathematicsLessonOrderRoute
 }
@@ -509,10 +551,14 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedStudentIndexRoute: AuthenticatedStudentIndexRoute,
   AuthenticatedTeacherIndexRoute: AuthenticatedTeacherIndexRoute,
   AuthenticatedStudentCoursesSlugRoute: AuthenticatedStudentCoursesSlugRoute,
+  AuthenticatedStudentP6ReadingIndexRoute:
+    AuthenticatedStudentP6ReadingIndexRoute,
   AuthenticatedStudentSummerEnglishIndexRoute:
     AuthenticatedStudentSummerEnglishIndexRoute,
   AuthenticatedStudentSummerMathematicsIndexRoute:
     AuthenticatedStudentSummerMathematicsIndexRoute,
+  AuthenticatedStudentP6ReadingLessonOrderRoute:
+    AuthenticatedStudentP6ReadingLessonOrderRoute,
   AuthenticatedStudentSummerEnglishLessonOrderRoute:
     AuthenticatedStudentSummerEnglishLessonOrderRoute,
   AuthenticatedStudentSummerMathematicsLessonOrderRoute:

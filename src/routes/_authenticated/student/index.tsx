@@ -5,6 +5,14 @@ import { useAuth } from "@/lib/auth-context";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { BookOpen, Award, ArrowRight } from "lucide-react";
+import { useEnrollmentSync } from "@/hooks/use-enrollment-sync";
+
+/** Courses with their own guided dashboard instead of the generic course player. */
+const COURSE_HOME: Record<string, string> = {
+  "summer-english": "/student/summer-english",
+  "summer-maths": "/student/summer-mathematics",
+  "p6-reading": "/student/p6-reading",
+};
 
 export const Route = createFileRoute("/_authenticated/student/")({
   head: () => ({ meta: [{ title: "My learning — CRF Academy" }, { name: "robots", content: "noindex" }] }),
@@ -50,8 +58,9 @@ function StudentHome() {
             {enrollments.map((e: any) => (
               <Link
                 key={e.id}
-                to="/student/courses/$slug"
-                params={{ slug: e.courses.slug }}
+                {...(COURSE_HOME[e.courses.slug]
+                  ? { to: COURSE_HOME[e.courses.slug] }
+                  : { to: "/student/courses/$slug", params: { slug: e.courses.slug } })}
                 className="group rounded-2xl border border-border bg-card p-6 shadow-card hover:shadow-elegant hover:-translate-y-0.5 transition"
               >
                 <div className="text-xs font-bold uppercase tracking-widest text-gold-foreground">{e.courses.level}</div>

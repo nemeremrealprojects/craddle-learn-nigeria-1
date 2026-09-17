@@ -7,6 +7,7 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { SUMMER_ENGLISH_SLUG } from "@/lib/summer-english";
 import { SUMMER_MATHS_SLUG } from "@/lib/summer-maths";
+import { P6_READING_SLUG } from "@/lib/p6-reading";
 
 
 
@@ -37,6 +38,8 @@ function PaymentCallback() {
             navigate({ to: "/student/summer-english", replace: true });
           } else if (r.slug === SUMMER_MATHS_SLUG) {
             navigate({ to: "/student/summer-mathematics", replace: true });
+          } else if (r.slug === P6_READING_SLUG) {
+            navigate({ to: "/student/p6-reading", replace: true });
           }
 
         }

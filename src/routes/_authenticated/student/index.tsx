@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/student/")({
 
 function StudentHome() {
   const { user } = useAuth();
+  useEnrollmentSync(user?.id);
   const { data: enrollments = [] } = useQuery({
     queryKey: ["my-enrollments", user?.id],
     enabled: !!user,

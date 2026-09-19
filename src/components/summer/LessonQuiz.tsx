@@ -25,10 +25,12 @@ export function LessonQuiz({
   quiz,
   studentId,
   onPassed,
+  completionLabel,
 }: {
   quiz: QuizData;
   studentId: string;
   onPassed?: () => void;
+  completionLabel?: string;
 }) {
   const qc = useQueryClient();
   const questions = [...(quiz.quiz_questions ?? [])].sort((a, b) => a.sort_order - b.sort_order);
@@ -113,6 +115,14 @@ export function LessonQuiz({
         {alreadyPassed && " ✅ passed"}
       </p>
 
+      {completionLabel && alreadyPassed && !result && best && (
+        <div className="mt-4 rounded-lg bg-gold-gradient p-4 text-center text-gold-foreground">
+          <p className="text-xs font-bold uppercase tracking-wide">{completionLabel}</p>
+          <p className="mt-1 font-display text-2xl font-bold">Score: {best.score}/{best.total}</p>
+          <p className="mt-1 font-bold">Passed ✓</p>
+        </div>
+      )}
+
       <ol className="mt-5 space-y-4">
         {questions.map((q, qi) => {
           const chosen = answers[q.id];
@@ -181,15 +191,25 @@ export function LessonQuiz({
       {result && (
         <div className="mt-5 space-y-3">
           <div
-            className={`rounded-xl p-4 text-center font-bold ${
+            className={`rounded-xl p-4 text-center ${
               resultPercent >= PASS_PERCENT
                 ? "bg-gold-gradient text-gold-foreground"
                 : "border border-red-300 bg-red-50 text-red-800"
             }`}
           >
-            {resultPercent >= PASS_PERCENT
-              ? `Passed! You scored ${result.score} / ${result.total} (${resultPercent}%) 🌟`
-              : `You scored ${result.score} / ${result.total} (${resultPercent}%). You need ${PASS_PERCENT}% — keep practising, you've got this! 💪`}
+            {resultPercent >= PASS_PERCENT ? (
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide">{completionLabel ?? "Quiz complete"}</p>
+                <p className="mt-1 font-display text-2xl font-bold">Score: {result.score}/{result.total}</p>
+                <p className="mt-1 font-bold">Passed ✓</p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide">Review lesson</p>
+                <p className="mt-1 font-display text-2xl font-bold">Score: {result.score}/{result.total}</p>
+                <p className="mt-1 font-semibold">You need {passMark}/{result.total} to pass. Review the lesson, then try again.</p>
+              </div>
+            )}
           </div>
           <button
             type="button"

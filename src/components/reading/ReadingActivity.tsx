@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CheckCircle2, HelpCircle } from "lucide-react";
 import type { ActivityQuestion } from "@/lib/p6-reading";
+import { Button } from "@/components/ui/button";
 
 /**
  * Practice multiple-choice questions with instant feedback.
@@ -42,22 +43,23 @@ export function ReadingActivity({
                   const isAnswer = i === q.correctIndex;
                   const show = answered && (isPicked || isAnswer);
                   return (
-                    <button
+                    <Button
                       key={opt}
                       type="button"
                       onClick={() => setPicked((p) => ({ ...p, [qi]: i }))}
                       disabled={answered}
-                      className={`rounded-lg border px-3 py-2 text-left text-sm transition ${
+                      variant="outline"
+                      className={`h-auto min-h-11 justify-start whitespace-normal px-3 py-2 text-left text-sm ${
                         show
                           ? isAnswer
                             ? "border-green-500 bg-green-50 text-green-800"
                             : "border-red-400 bg-red-50 text-red-800"
-                          : "border-border bg-card hover:bg-accent"
+                          : "bg-card"
                       }`}
                     >
                       <span className="mr-2 font-bold">{String.fromCharCode(65 + i)}.</span>
                       {opt}
-                    </button>
+                    </Button>
                   );
                 })}
               </div>

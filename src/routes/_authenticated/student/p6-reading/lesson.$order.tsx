@@ -2,15 +2,15 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft,
-  ArrowRight,
   BookMarked,
   BookOpenText,
   CheckCircle2,
   Download,
+  FileDown,
   LayoutDashboard,
   Lightbulb,
   Loader2,
+  PlayCircle,
   Target,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,6 +35,7 @@ import { ReadingActivity } from "@/components/reading/ReadingActivity";
 import { LessonQuiz, type QuizData } from "@/components/summer/LessonQuiz";
 import { AssignmentUpload, type AssignmentData } from "@/components/summer/AssignmentUpload";
 import { useEnrollmentSync } from "@/hooks/use-enrollment-sync";
+import { Button } from "@/components/ui/button";
 import {
   markLessonCompleted,
   touchLesson,
@@ -49,6 +50,11 @@ export const Route = createFileRoute("/_authenticated/student/p6-reading/lesson/
   head: ({ params }) => ({
     meta: [
       { title: `Lesson ${params.order} — Primary 6 Reading Skills | CRF Online Academy` },
+      { name: "description", content: "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
+      { property: "og:title", content: `Lesson ${params.order} — Primary 6 Reading Skills | CRF Online Academy` },
+      { property: "og:description", content: "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -71,9 +77,6 @@ function P6ReadingLessonPage() {
   const { data: progress = [] } = useSummerProgress(course?.id, user?.id);
 
   const lesson = useMemo(() => lessons.find((l) => l.sort_order === orderNum) ?? null, [lessons, orderNum]);
-  const index = lesson ? lessons.findIndex((l) => l.id === lesson.id) : -1;
-  const prev = index > 0 ? lessons[index - 1] : null;
-  const next = index >= 0 && index < lessons.length - 1 ? lessons[index + 1] : null;
 
   const { data: quiz } = useQuery({
     queryKey: ["p6-quiz", lesson?.id],
@@ -155,10 +158,12 @@ function P6ReadingLessonPage() {
   useTimeTracker(user?.id, lesson?.id);
 
   const quizPercent = bestAttempt?.total ? Math.round((bestAttempt.score / bestAttempt.total) * 100) : null;
-  const quizPassed = !quiz || (quizPercent !== null && quizPercent >= PASS_PERCENT);
-  const assignmentDone = !assignment || !!submission;
+  const quizPassed = !!quiz && quizPercent !== null && quizPercent >= PASS_PERCENT;
+  const assignmentDone = !!assignment && !!submission;
   const alreadyCompleted = !!progress.find((p) => p.lesson_id === lesson?.id && p.completed);
-  const canComplete = quizPassed && assignmentDone;
+  const canComplete = readConfirmed && quizPassed && assignmentDone;
+  const completedSteps = alreadyCompleted ? 3 : [readConfirmed, quizPassed, assignmentDone].filter(Boolean).length;
+  const weekProgress = Math.round((completedSteps / 3) * 100);
 
   async function completeLesson() {
     if (!user || !course || !lesson) return;
@@ -186,12 +191,12 @@ function P6ReadingLessonPage() {
           <div>
             <h1 className="font-display text-2xl font-bold text-navy">This lesson is locked</h1>
             <p className="mt-2 text-muted-foreground">Enroll in Primary 6 Reading Skills for ₦3,000 to unlock it.</p>
-            <button
+            <Button
               onClick={() => navigate({ to: "/courses/$slug", params: { slug: P6_READING_SLUG } })}
-              className="mt-5 rounded-lg bg-gold-gradient px-6 py-3 font-bold text-gold-foreground shadow-gold"
+              className="mt-5 h-11 bg-gold-gradient px-6 font-bold text-gold-foreground shadow-gold"
             >
               Enroll now
-            </button>
+            </Button>
           </div>
         </div>
         <Footer />
@@ -231,18 +236,23 @@ function P6ReadingLessonPage() {
       <Header />
 
       <section className="bg-hero text-navy-foreground">
-        <div className="mx-auto max-w-4xl px-4 py-7 sm:py-9">
-          {lesson.module_title && (
-            <p className="text-xs font-bold uppercase tracking-widest text-gold">{lesson.module_title}</p>
-          )}
-          <p className="mt-1 text-sm font-semibold text-navy-foreground/80">Lesson {lesson.sort_order} of Week 1</p>
-          <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl md:text-4xl">{lesson.title}</h1>
+        <div className="mx-auto max-w-4xl px-4 py-7 sm:py-10">
+          <p className="text-sm font-semibold text-gold">Primary 6 Reading Skills</p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold uppercase tracking-wide text-navy-foreground/75 sm:text-sm">
+            <span>Week 1 of 12</span><span aria-hidden="true">•</span><span>Reading Foundations</span><span aria-hidden="true">•</span><span>Lesson 1</span>
+          </div>
+          <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{lesson.title}</h1>
           <p className="mt-2 text-sm text-navy-foreground/80">Estimated time: 35–45 minutes</p>
-          {alreadyCompleted && (
-            <p className="mt-3 inline-flex items-center gap-2 rounded-lg bg-gold-gradient px-3 py-1.5 text-sm font-bold text-gold-foreground">
-              <CheckCircle2 className="h-4 w-4" /> Lesson 1 completed
-            </p>
-          )}
+          <div className="mt-6 max-w-xl" aria-label={`Week 1 progress: ${weekProgress}%`}>
+            <div className="mb-2 flex items-center justify-between gap-4 text-sm font-semibold">
+              <span>Week 1 progress</span>
+              <span>{weekProgress}%</span>
+            </div>
+            <div className="h-2.5 overflow-hidden rounded-full bg-navy-foreground/20">
+              <div className="h-full rounded-full bg-gold transition-[width] duration-500" style={{ width: `${weekProgress}%` }} />
+            </div>
+          </div>
+          {alreadyCompleted && <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-gold"><CheckCircle2 className="h-4 w-4" /> Week 1 completed</p>}
         </div>
       </section>
 
@@ -275,15 +285,18 @@ function P6ReadingLessonPage() {
 
         {/* Video */}
         {lesson.video_url && (
-          <section className="overflow-hidden rounded-[20px] border border-border bg-card shadow-elegant">
-            <div className="aspect-video bg-black">
+          <section aria-labelledby="watch-lesson-heading">
+            <h2 id="watch-lesson-heading" className="mb-3 inline-flex items-center gap-2 font-display text-xl font-bold uppercase text-navy">
+              <PlayCircle className="h-5 w-5 text-gold-foreground" /> Watch the lesson
+            </h2>
+            <div className="aspect-video overflow-hidden rounded-lg bg-navy shadow-elegant">
               <YouTubeEmbed
                 url={lesson.video_url}
                 title="Reading Comprehension for Kids | How to Read for Meaning"
                 poster={lesson.thumbnail_url}
               />
             </div>
-            <p className="px-4 py-3 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-muted-foreground">
               Reading Comprehension for Kids | How to Read for Meaning
             </p>
           </section>
@@ -300,14 +313,14 @@ function P6ReadingLessonPage() {
               mean. A good reader actively thinks while reading.
             </p>
             {isLessonOne ? (
-              <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+              <ol className="mt-5 divide-y divide-border border-y border-border">
                 {READER_STRATEGIES.map((s) => (
-                  <li key={s.title} className="rounded-xl border border-gold/40 bg-gold/5 p-4">
-                    <span className="block font-display font-bold uppercase tracking-wide text-navy">{s.title}</span>
-                    <span className="mt-1 block text-sm text-foreground/90">{s.body}</span>
+                  <li key={s.title} className="grid gap-1 py-4 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)] sm:gap-6">
+                    <span className="font-display font-bold text-navy">{s.title.replace(/^\d+\.\s*/, "")}</span>
+                    <span className="text-sm leading-relaxed text-foreground/90 sm:text-base">{s.body}</span>
                   </li>
                 ))}
-              </ul>
+              </ol>
             ) : (
               <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90 sm:text-base">
                 {lesson.notes}
@@ -335,16 +348,17 @@ function P6ReadingLessonPage() {
             </section>
 
             {/* Reading passage */}
-            <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
-              <h2 className="inline-flex items-center gap-2 font-display text-xl font-bold uppercase tracking-wide text-navy">
+            <section className="border-y border-border bg-card py-6 sm:py-8">
+              <p className="text-xs font-bold uppercase tracking-wide text-gold-foreground">Reading practice</p>
+              <h2 className="mt-2 inline-flex items-center gap-2 font-display text-2xl font-bold text-navy">
                 <BookOpenText className="h-5 w-5 text-gold-foreground" /> {READING_PASSAGE.title}
               </h2>
-              <div className="mt-3 space-y-3 text-sm leading-relaxed text-foreground/90 sm:text-base">
+              <div className="mt-5 max-w-3xl space-y-4 text-base leading-8 text-foreground/90 sm:text-lg">
                 {READING_PASSAGE.paragraphs.map((p) => (
                   <p key={p.slice(0, 24)}>{p}</p>
                 ))}
               </div>
-              <label className="mt-4 flex cursor-pointer items-center gap-2 text-sm font-semibold text-navy">
+              <label className="mt-6 flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-cream p-3 text-sm font-semibold text-navy">
                 <input
                   type="checkbox"
                   checked={readConfirmed}
@@ -363,16 +377,17 @@ function P6ReadingLessonPage() {
             />
 
             {/* Reading strategy */}
-            <section className="rounded-2xl border-2 border-gold/30 bg-gold/5 p-4 sm:p-6">
+            <section className="border-y-2 border-gold/40 bg-gold/5 px-4 py-6 sm:px-6">
               <h2 className="font-display text-xl font-bold text-navy">Remember: STOP — THINK — CHECK</h2>
-              <ul className="mt-3 grid gap-3 sm:grid-cols-3">
-                {STOP_THINK_CHECK.map((s) => (
-                  <li key={s.title} className="rounded-xl border border-border bg-card p-4">
-                    <span className="block font-display text-lg font-bold text-navy">{s.title}</span>
+              <ol className="mt-4 grid gap-3 sm:grid-cols-3">
+                {STOP_THINK_CHECK.map((s, stepIndex) => (
+                  <li key={s.title} className="border-l-4 border-gold bg-card p-4 shadow-card">
+                    <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">Step {stepIndex + 1}</span>
+                    <span className="mt-1 block font-display text-xl font-bold text-navy">{s.title}</span>
                     <span className="mt-1 block text-sm text-foreground/90">{s.body}</span>
                   </li>
                 ))}
-              </ul>
+              </ol>
               <p className="mt-3 text-sm font-semibold text-navy">{REREAD_NOTE}</p>
             </section>
 
@@ -399,8 +414,8 @@ function P6ReadingLessonPage() {
         {/* Worksheet */}
         {materials.length > 0 && (
           <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
-            <h2 className="font-display text-xl font-bold text-navy">Worksheet</h2>
-            <ul className="mt-3 space-y-2">
+            <h2 className="font-display text-xl font-bold text-navy">Week 1 worksheet</h2>
+            <ul className="mt-4 space-y-2">
               {materials.map((m: any) => (
                 <li key={m.id}>
                   <a
@@ -408,13 +423,14 @@ function P6ReadingLessonPage() {
                     target="_blank"
                     rel="noreferrer"
                     download
-                    className="flex items-center gap-3 rounded-xl border border-border p-3 transition hover:bg-accent"
+                    className="flex min-h-12 items-center gap-3 rounded-lg bg-navy px-4 py-3 font-semibold text-navy-foreground transition hover:bg-navy/90"
                   >
-                    <Download className="h-5 w-5 flex-shrink-0 text-gold-foreground" />
+                    <FileDown className="h-5 w-5 flex-shrink-0 text-gold" />
                     <span className="flex-1">
-                      <span className="block font-semibold text-navy">{m.title}</span>
-                      {m.description && <span className="block text-sm text-muted-foreground">{m.description}</span>}
+                      <span className="block">Download Week 1 Worksheet</span>
+                      {m.description && <span className="block text-xs font-normal text-navy-foreground/75">{m.description}</span>}
                     </span>
+                    <Download className="h-4 w-4 flex-shrink-0" />
                   </a>
                 </li>
               ))}
@@ -428,26 +444,9 @@ function P6ReadingLessonPage() {
             <LessonQuiz
               quiz={quiz}
               studentId={user.id}
+              completionLabel="Quiz complete"
               onPassed={() => qc.invalidateQueries({ queryKey: ["quiz-best", quiz.id] })}
             />
-            {quizPercent !== null && (
-              <div
-                className={`rounded-2xl border-2 p-4 text-center ${
-                  quizPassed ? "border-green-400 bg-green-50" : "border-red-300 bg-red-50"
-                }`}
-              >
-                {quizPassed ? (
-                  <p className="font-display text-lg font-bold text-green-800">✅ Quiz Complete — you may continue</p>
-                ) : (
-                  <>
-                    <p className="font-display text-lg font-bold text-red-800">Review Lesson</p>
-                    <p className="mt-1 text-sm text-red-800/80">
-                      You need 4 out of 5 to pass. Read the lesson again, then retake the quiz above.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
           </>
         )}
 
@@ -457,48 +456,35 @@ function P6ReadingLessonPage() {
             <AssignmentUpload
               assignment={assignment}
               studentId={user.id}
+              pendingLabel="Awaiting teacher review"
               onSubmitted={() => qc.invalidateQueries({ queryKey: ["submission", assignment.id] })}
             />
-            {submission && submission.status !== "graded" && (
-              <p className="rounded-xl border border-border bg-card p-3 text-center text-sm font-semibold text-navy">
-                Submitted — Awaiting teacher review
-              </p>
-            )}
           </>
         )}
 
         {/* Completion */}
         <section
-          className={`rounded-2xl border-2 p-4 text-center sm:p-6 ${
+          className={`border-y-2 p-4 text-center sm:p-7 ${
             alreadyCompleted ? "border-gold bg-gold/10" : "border-dashed border-border bg-card"
           }`}
         >
-          <p className="font-display text-xl font-bold text-navy">You've reached the end of Week 1 🎉</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-gold-foreground">Week 1</p>
+          <p className="mt-1 font-display text-2xl font-bold text-navy">{alreadyCompleted ? "Week 1 complete" : "Complete Week 1"}</p>
           {alreadyCompleted ? (
             <>
               <p className="mt-2 inline-flex items-center gap-2 font-semibold text-navy">
-                <CheckCircle2 className="h-5 w-5 text-gold-foreground" /> Lesson 1 completed
+                <CheckCircle2 className="h-5 w-5 text-gold-foreground" /> Week 1 completed
               </p>
               <p className="mt-1 text-sm text-muted-foreground">Your progress has been saved.</p>
-              {next && (
-                <Link
-                  to="/student/p6-reading/lesson/$order"
-                  params={{ order: String(next.sort_order) }}
-                  className="mt-4 inline-flex items-center gap-2 rounded-xl bg-gold-gradient px-6 py-3 font-bold text-gold-foreground shadow-gold"
-                >
-                  Next Lesson <ArrowRight className="h-4 w-4" />
-                </Link>
-              )}
+              <Link to="/student/p6-reading" className="mt-4 inline-flex items-center gap-2 rounded-lg bg-navy px-6 py-3 font-semibold text-navy-foreground"><LayoutDashboard className="h-4 w-4" /> Primary 6 Reading Skills</Link>
             </>
           ) : (
             <>
               <p className="mt-2 text-sm text-muted-foreground">Before completing the lesson, you should have:</p>
               <ul className="mt-3 inline-block space-y-1 text-left text-sm">
-                <li className="text-foreground/80">✓ Watched the lesson video</li>
                 <li className={readConfirmed ? "text-green-700" : "text-muted-foreground"}>
                   {readConfirmed ? "✅" : "⬜"} Read the lesson and the passage
                 </li>
-                <li className="text-foreground/80">✓ Completed the reading activity</li>
                 <li className={quizPassed ? "text-green-700" : "text-muted-foreground"}>
                   {quizPassed ? "✅" : "⬜"} Passed the Week 1 quiz (4 of 5)
                 </li>
@@ -506,17 +492,17 @@ function P6ReadingLessonPage() {
                   {assignmentDone ? "✅" : "⬜"} Submitted the Week 1 assignment
                 </li>
               </ul>
-              <button
+              <Button
                 type="button"
                 onClick={completeLesson}
                 disabled={!canComplete}
-                className="mt-5 block w-full rounded-xl bg-navy p-3 font-bold text-navy-foreground disabled:opacity-50 sm:mx-auto sm:w-auto sm:px-8"
+                className="mt-5 h-12 w-full bg-navy px-8 font-bold text-navy-foreground sm:mx-auto sm:w-auto"
               >
                 Mark lesson complete
-              </button>
+              </Button>
               {!canComplete && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Pass the quiz and submit your assignment to unlock this button.
+                  Confirm that you have read the passage, pass the quiz and submit your assignment to unlock this button.
                 </p>
               )}
             </>
@@ -524,39 +510,13 @@ function P6ReadingLessonPage() {
         </section>
 
         {/* Navigation */}
-        <nav className="grid gap-3 sm:grid-cols-3">
-          {prev ? (
-            <Link
-              to="/student/p6-reading/lesson/$order"
-              params={{ order: String(prev.sort_order) }}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 font-semibold text-navy"
-            >
-              <ArrowLeft className="h-4 w-4" /> Previous Lesson
-            </Link>
-          ) : (
-            <span className="inline-flex items-center justify-center gap-2 rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground">
-              <ArrowLeft className="h-4 w-4" /> Previous Lesson
-            </span>
-          )}
+        <nav className="grid gap-3 sm:grid-cols-2">
           <Link
             to="/student/p6-reading"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-navy p-3 font-semibold text-navy-foreground"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-navy p-3 font-semibold text-navy-foreground sm:col-span-2"
           >
-            <LayoutDashboard className="h-4 w-4" /> Back to Dashboard
+            <LayoutDashboard className="h-4 w-4" /> Primary 6 Reading Skills
           </Link>
-          {next ? (
-            <Link
-              to="/student/p6-reading/lesson/$order"
-              params={{ order: String(next.sort_order) }}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card p-3 font-semibold text-navy"
-            >
-              Next Lesson <ArrowRight className="h-4 w-4" />
-            </Link>
-          ) : (
-            <span className="inline-flex items-center justify-center gap-2 rounded-xl border border-dashed border-border p-3 text-sm text-muted-foreground">
-              Next Lesson <ArrowRight className="h-4 w-4" />
-            </span>
-          )}
         </nav>
       </main>
 

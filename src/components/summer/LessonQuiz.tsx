@@ -115,6 +115,14 @@ export function LessonQuiz({
         {alreadyPassed && " ✅ passed"}
       </p>
 
+      {completionLabel && alreadyPassed && !result && best && (
+        <div className="mt-4 rounded-lg bg-gold-gradient p-4 text-center text-gold-foreground">
+          <p className="text-xs font-bold uppercase tracking-wide">{completionLabel}</p>
+          <p className="mt-1 font-display text-2xl font-bold">Score: {best.score}/{best.total}</p>
+          <p className="mt-1 font-bold">Passed ✓</p>
+        </div>
+      )}
+
       <ol className="mt-5 space-y-4">
         {questions.map((q, qi) => {
           const chosen = answers[q.id];

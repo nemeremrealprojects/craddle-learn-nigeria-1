@@ -161,7 +161,7 @@ function P6ReadingLessonPage() {
   const quizPassed = !!quiz && quizPercent !== null && quizPercent >= PASS_PERCENT;
   const assignmentDone = !!assignment && !!submission;
   const alreadyCompleted = !!progress.find((p) => p.lesson_id === lesson?.id && p.completed);
-  const canComplete = quizPassed && assignmentDone;
+  const canComplete = readConfirmed && quizPassed && assignmentDone;
   const completedSteps = alreadyCompleted ? 3 : [readConfirmed, quizPassed, assignmentDone].filter(Boolean).length;
   const weekProgress = Math.round((completedSteps / 3) * 100);
 
@@ -502,7 +502,7 @@ function P6ReadingLessonPage() {
               </Button>
               {!canComplete && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Pass the quiz and submit your assignment to unlock this button.
+                  Confirm that you have read the passage, pass the quiz and submit your assignment to unlock this button.
                 </p>
               )}
             </>

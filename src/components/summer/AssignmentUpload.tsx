@@ -22,10 +22,12 @@ export function AssignmentUpload({
   assignment,
   studentId,
   onSubmitted,
+  pendingLabel,
 }: {
   assignment: AssignmentData;
   studentId: string;
   onSubmitted?: () => void;
+  pendingLabel?: string;
 }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -95,7 +97,7 @@ export function AssignmentUpload({
             Sent on {new Date(submission.submitted_at).toLocaleDateString()} ·{" "}
             {submission.status === "graded"
               ? `Graded${submission.score !== null ? `: ${submission.score}` : ""}`
-              : "Waiting for your teacher's feedback"}
+              : (pendingLabel ?? "Waiting for your teacher's feedback")}
           </p>
           {submission.feedback && <p className="mt-2 text-sm text-green-900">Teacher: {submission.feedback}</p>}
         </div>

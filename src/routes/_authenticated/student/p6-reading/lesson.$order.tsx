@@ -2,8 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft,
-  ArrowRight,
   BookMarked,
   BookOpenText,
   CheckCircle2,
@@ -37,6 +35,7 @@ import { ReadingActivity } from "@/components/reading/ReadingActivity";
 import { LessonQuiz, type QuizData } from "@/components/summer/LessonQuiz";
 import { AssignmentUpload, type AssignmentData } from "@/components/summer/AssignmentUpload";
 import { useEnrollmentSync } from "@/hooks/use-enrollment-sync";
+import { Button } from "@/components/ui/button";
 import {
   markLessonCompleted,
   touchLesson,
@@ -51,6 +50,11 @@ export const Route = createFileRoute("/_authenticated/student/p6-reading/lesson/
   head: ({ params }) => ({
     meta: [
       { title: `Lesson ${params.order} — Primary 6 Reading Skills | CRF Online Academy` },
+      { name: "description", content: "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
+      { property: "og:title", content: `Lesson ${params.order} — Primary 6 Reading Skills | CRF Online Academy` },
+      { property: "og:description", content: "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -73,9 +77,6 @@ function P6ReadingLessonPage() {
   const { data: progress = [] } = useSummerProgress(course?.id, user?.id);
 
   const lesson = useMemo(() => lessons.find((l) => l.sort_order === orderNum) ?? null, [lessons, orderNum]);
-  const index = lesson ? lessons.findIndex((l) => l.id === lesson.id) : -1;
-  const prev = index > 0 ? lessons[index - 1] : null;
-  const next = index >= 0 && index < lessons.length - 1 ? lessons[index + 1] : null;
 
   const { data: quiz } = useQuery({
     queryKey: ["p6-quiz", lesson?.id],
@@ -190,12 +191,12 @@ function P6ReadingLessonPage() {
           <div>
             <h1 className="font-display text-2xl font-bold text-navy">This lesson is locked</h1>
             <p className="mt-2 text-muted-foreground">Enroll in Primary 6 Reading Skills for ₦3,000 to unlock it.</p>
-            <button
+            <Button
               onClick={() => navigate({ to: "/courses/$slug", params: { slug: P6_READING_SLUG } })}
-              className="mt-5 rounded-lg bg-gold-gradient px-6 py-3 font-bold text-gold-foreground shadow-gold"
+              className="mt-5 h-11 bg-gold-gradient px-6 font-bold text-gold-foreground shadow-gold"
             >
               Enroll now
-            </button>
+            </Button>
           </div>
         </div>
         <Footer />
@@ -473,6 +474,7 @@ function P6ReadingLessonPage() {
             <AssignmentUpload
               assignment={assignment}
               studentId={user.id}
+              pendingLabel="Awaiting teacher review"
               onSubmitted={() => qc.invalidateQueries({ queryKey: ["submission", assignment.id] })}
             />
             {submission && submission.status !== "graded" && (
@@ -513,14 +515,14 @@ function P6ReadingLessonPage() {
                   {assignmentDone ? "✅" : "⬜"} Submitted the Week 1 assignment
                 </li>
               </ul>
-              <button
+              <Button
                 type="button"
                 onClick={completeLesson}
                 disabled={!canComplete}
-                className="mt-5 block w-full rounded-xl bg-navy p-3 font-bold text-navy-foreground disabled:opacity-50 sm:mx-auto sm:w-auto sm:px-8"
+                className="mt-5 h-12 w-full bg-navy px-8 font-bold text-navy-foreground sm:mx-auto sm:w-auto"
               >
                 Mark lesson complete
-              </button>
+              </Button>
               {!canComplete && (
                 <p className="mt-2 text-xs text-muted-foreground">
                   Pass the quiz and submit your assignment to unlock this button.

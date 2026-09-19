@@ -447,24 +447,6 @@ function P6ReadingLessonPage() {
               completionLabel="Quiz complete"
               onPassed={() => qc.invalidateQueries({ queryKey: ["quiz-best", quiz.id] })}
             />
-            {quizPercent !== null && (
-              <div
-                className={`rounded-2xl border-2 p-4 text-center ${
-                  quizPassed ? "border-green-400 bg-green-50" : "border-red-300 bg-red-50"
-                }`}
-              >
-                {quizPassed ? (
-                  <p className="font-display text-lg font-bold text-green-800">✅ Quiz Complete — you may continue</p>
-                ) : (
-                  <>
-                    <p className="font-display text-lg font-bold text-red-800">Review Lesson</p>
-                    <p className="mt-1 text-sm text-red-800/80">
-                      You need 4 out of 5 to pass. Read the lesson again, then retake the quiz above.
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
           </>
         )}
 
@@ -477,11 +459,6 @@ function P6ReadingLessonPage() {
               pendingLabel="Awaiting teacher review"
               onSubmitted={() => qc.invalidateQueries({ queryKey: ["submission", assignment.id] })}
             />
-            {submission && submission.status !== "graded" && (
-              <p className="rounded-xl border border-border bg-card p-3 text-center text-sm font-semibold text-navy">
-                Submitted — Awaiting teacher review
-              </p>
-            )}
           </>
         )}
 

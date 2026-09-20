@@ -29,15 +29,23 @@ import {
   REREAD_NOTE,
   STOP_THINK_CHECK,
   VOCABULARY_QUESTIONS,
+  MAIN_IDEA_CHECK,
+  MAIN_IDEA_STATEMENTS,
+  WEEK_TWO_COMPREHENSION,
+  WEEK_TWO_INTRO,
+  WEEK_TWO_PASSAGE,
+  WEEK_TWO_VOCABULARY,
 } from "@/lib/p6-reading";
 import { YouTubeEmbed } from "@/components/summer/YouTubeEmbed";
 import { ReadingActivity } from "@/components/reading/ReadingActivity";
+import { MainIdeaActivity, type MainIdeaChoice } from "@/components/reading/MainIdeaActivity";
 import { LessonQuiz, type QuizData } from "@/components/summer/LessonQuiz";
 import { AssignmentUpload, type AssignmentData } from "@/components/summer/AssignmentUpload";
 import { useEnrollmentSync } from "@/hooks/use-enrollment-sync";
 import { Button } from "@/components/ui/button";
 import {
   markLessonCompleted,
+  saveLessonResponses,
   touchLesson,
   useSummerCourse,
   useSummerEnrollment,
@@ -70,6 +78,9 @@ function P6ReadingLessonPage() {
   useEnrollmentSync(user?.id);
 
   const [readConfirmed, setReadConfirmed] = useState(false);
+  const [videoWatched, setVideoWatched] = useState(false);
+  const [readingPracticeDone, setReadingPracticeDone] = useState(false);
+  const [savingActivity, setSavingActivity] = useState(false);
 
   const { data: course, isLoading: loadingCourse } = useSummerCourse(P6_READING_SLUG);
   const { data: enrollment, isLoading: loadingEnroll } = useSummerEnrollment(course?.id, user?.id);
@@ -161,14 +172,35 @@ function P6ReadingLessonPage() {
   const quizPassed = !!quiz && quizPercent !== null && quizPercent >= PASS_PERCENT;
   const assignmentDone = !!assignment && !!submission;
   const alreadyCompleted = !!progress.find((p) => p.lesson_id === lesson?.id && p.completed);
-  const canComplete = readConfirmed && quizPassed && assignmentDone;
-  const completedSteps = alreadyCompleted ? 3 : [readConfirmed, quizPassed, assignmentDone].filter(Boolean).length;
-  const weekProgress = Math.round((completedSteps / 3) * 100);
+  const lessonProgress = progress.find((p) => p.lesson_id === lesson?.id);
+  const isLessonTwo = lesson.sort_order === 2;
+  const storedResponses = lessonProgress?.responses ?? {};
+  const storedWeekTwo = typeof storedResponses.weekTwo === "object" && storedResponses.weekTwo !== null
+    ? storedResponses.weekTwo as { mainIdeaAnswers?: Record<string, MainIdeaChoice>; mainIdeaComplete?: boolean }
+    : {};
+  const mainIdeaDone = !!storedWeekTwo.mainIdeaComplete;
+  const weekTwoRequirements = [videoWatched, readConfirmed, readingPracticeDone, mainIdeaDone, quizPassed, assignmentDone];
+  const weekOneRequirements = [readConfirmed, quizPassed, assignmentDone];
+  const requirements = isLessonTwo ? weekTwoRequirements : weekOneRequirements;
+  const canComplete = requirements.every(Boolean);
+  const completedSteps = alreadyCompleted ? requirements.length : requirements.filter(Boolean).length;
+  const weekProgress = Math.round((completedSteps / requirements.length) * 100);
 
   async function completeLesson() {
     if (!user || !course || !lesson) return;
     await markLessonCompleted(user.id, course.id, lesson.id);
     qc.invalidateQueries({ queryKey: ["summer-progress"] });
+  }
+
+  async function saveMainIdeaActivity(answers: Record<number, MainIdeaChoice>) {
+    if (!user || !course || !lesson) return;
+    setSavingActivity(true);
+    await saveLessonResponses(user.id, course.id, lesson.id, {
+      ...storedResponses,
+      weekTwo: { mainIdeaAnswers: answers, mainIdeaComplete: true },
+    });
+    await qc.invalidateQueries({ queryKey: ["summer-progress", course.id, user.id] });
+    setSavingActivity(false);
   }
 
   if (loadingCourse || loadingEnroll) {
@@ -226,6 +258,12 @@ function P6ReadingLessonPage() {
   }
 
   const isLessonOne = lesson.sort_order === 1;
+  if (!isLessonOne && !isLessonTwo) {
+    return null;
+  }
+  const weekNumber = isLessonTwo ? 2 : 1;
+  const moduleName = isLessonTwo ? "Reading for Main Idea and Supporting Details" : "Reading Foundations";
+  const estimatedTime = isLessonTwo ? "40–50 minutes" : "35–45 minutes";
   const vocabulary = (lesson.vocabulary ?? []).map((word) => ({
     word,
     meaning: READING_VOCABULARY[word] ?? null,
@@ -239,20 +277,20 @@ function P6ReadingLessonPage() {
         <div className="mx-auto max-w-4xl px-4 py-7 sm:py-10">
           <p className="text-sm font-semibold text-gold">Primary 6 Reading Skills</p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-bold uppercase tracking-wide text-navy-foreground/75 sm:text-sm">
-            <span>Week 1 of 12</span><span aria-hidden="true">•</span><span>Reading Foundations</span><span aria-hidden="true">•</span><span>Lesson 1</span>
+             <span>Week {weekNumber} of 12</span><span aria-hidden="true">•</span><span>{moduleName}</span><span aria-hidden="true">•</span><span>Lesson {lesson.sort_order}</span>
           </div>
           <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{lesson.title}</h1>
-          <p className="mt-2 text-sm text-navy-foreground/80">Estimated time: 35–45 minutes</p>
-          <div className="mt-6 max-w-xl" aria-label={`Week 1 progress: ${weekProgress}%`}>
+           <p className="mt-2 text-sm text-navy-foreground/80">Estimated time: {estimatedTime}</p>
+           <div className="mt-6 max-w-xl" aria-label={`Week ${weekNumber} progress: ${weekProgress}%`}>
             <div className="mb-2 flex items-center justify-between gap-4 text-sm font-semibold">
-              <span>Week 1 progress</span>
+               <span>Week {weekNumber} progress</span>
               <span>{weekProgress}%</span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-navy-foreground/20">
               <div className="h-full rounded-full bg-gold transition-[width] duration-500" style={{ width: `${weekProgress}%` }} />
             </div>
           </div>
-          {alreadyCompleted && <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-gold"><CheckCircle2 className="h-4 w-4" /> Week 1 completed</p>}
+           {alreadyCompleted && <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-gold"><CheckCircle2 className="h-4 w-4" /> Week {weekNumber} completed</p>}
         </div>
       </section>
 
@@ -262,6 +300,12 @@ function P6ReadingLessonPage() {
           <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
             <h2 className="font-display text-xl font-bold text-navy">Lesson introduction</h2>
             <p className="mt-3 text-sm leading-relaxed text-foreground/90 sm:text-base">{READING_INTRO}</p>
+          </section>
+        )}
+        {isLessonTwo && (
+          <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
+            <h2 className="font-display text-xl font-bold text-navy">Lesson introduction</h2>
+            <p className="mt-3 text-sm leading-relaxed text-foreground/90 sm:text-base">{WEEK_TWO_INTRO}</p>
           </section>
         )}
 
@@ -292,12 +336,13 @@ function P6ReadingLessonPage() {
             <div className="aspect-video overflow-hidden rounded-lg bg-navy shadow-elegant">
               <YouTubeEmbed
                 url={lesson.video_url}
-                title="Reading Comprehension for Kids | How to Read for Meaning"
+                title={isLessonTwo ? "Finding the Main Idea and Supporting Details" : "Reading Comprehension for Kids | How to Read for Meaning"}
                 poster={lesson.thumbnail_url}
+                onPlay={isLessonTwo ? () => setVideoWatched(true) : undefined}
               />
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Reading Comprehension for Kids | How to Read for Meaning
+               {isLessonTwo ? "Finding the Main Idea and Supporting Details" : "Reading Comprehension for Kids | How to Read for Meaning"}
             </p>
           </section>
         )}
@@ -396,6 +441,43 @@ function P6ReadingLessonPage() {
           </>
         )}
 
+        {isLessonTwo && (
+          <>
+            <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
+              <h2 className="font-display text-xl font-bold uppercase text-navy">What is the main idea?</h2>
+              <p className="mt-3 text-sm leading-relaxed text-foreground/90 sm:text-base">The main idea tells what a passage is mostly about. It is the most important message the writer wants you to understand.</p>
+              <h2 className="mt-6 font-display text-xl font-bold uppercase text-navy">What are supporting details?</h2>
+              <p className="mt-3 text-sm leading-relaxed text-foreground/90 sm:text-base">Supporting details give information that helps the reader understand or prove the main idea.</p>
+              <div className="mt-5 border-l-4 border-gold bg-gold/5 p-4">
+                <p className="text-sm font-bold uppercase text-gold-foreground">Topic: Exercise</p>
+                <p className="mt-2 font-semibold text-navy">Main idea: Regular exercise helps people stay healthy.</p>
+                <p className="mt-3 text-sm font-semibold text-navy">Supporting details:</p>
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-foreground/90 sm:text-base">
+                  <li>Exercise strengthens the body.</li><li>It helps improve fitness.</li><li>It can give people more energy.</li>
+                </ul>
+              </div>
+            </section>
+
+            <section className="border-y-2 border-gold/40 bg-gold/5 px-4 py-6 sm:px-6">
+              <h2 className="font-display text-xl font-bold uppercase text-navy">Main idea check</h2>
+              <ol className="mt-4 grid gap-3 sm:grid-cols-2">
+                {MAIN_IDEA_CHECK.map((prompt, index) => <li key={prompt} className="grid grid-cols-[auto_minmax(0,1fr)] gap-3 bg-card p-4 shadow-card"><span className="grid h-7 w-7 place-items-center rounded-full bg-navy text-sm font-bold text-navy-foreground">{index + 1}</span><span className="font-semibold text-navy">{prompt}</span></li>)}
+              </ol>
+            </section>
+
+            <section className="border-y border-border bg-card py-6 sm:py-8">
+              <p className="text-xs font-bold uppercase tracking-wide text-gold-foreground">Reading practice</p>
+              <h2 className="mt-2 inline-flex items-center gap-2 font-display text-2xl font-bold text-navy"><BookOpenText className="h-5 w-5 text-gold-foreground" /> {WEEK_TWO_PASSAGE.title}</h2>
+              <div className="mt-5 max-w-3xl space-y-4 text-base leading-8 text-foreground/90 sm:text-lg">{WEEK_TWO_PASSAGE.paragraphs.map((paragraph) => <p key={paragraph.slice(0, 24)}>{paragraph}</p>)}</div>
+              <label className="mt-6 flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-cream p-3 text-sm font-semibold text-navy"><input type="checkbox" checked={readConfirmed} onChange={(event) => setReadConfirmed(event.target.checked)} className="h-4 w-4 accent-[hsl(var(--navy))]" /> I have read the lesson and passage</label>
+            </section>
+
+            <ReadingActivity heading="Let's think about the passage" intro="Choose an answer to see instant feedback." questions={WEEK_TWO_COMPREHENSION} onComplete={() => setReadingPracticeDone(true)} />
+            <MainIdeaActivity statements={MAIN_IDEA_STATEMENTS} initialAnswers={Object.fromEntries(Object.entries(storedWeekTwo.mainIdeaAnswers ?? {}).map(([key, value]) => [Number(key), value]))} completed={mainIdeaDone} saving={savingActivity} onSubmit={saveMainIdeaActivity} />
+            <ReadingActivity heading="Vocabulary activity" questions={WEEK_TWO_VOCABULARY} />
+          </>
+        )}
+
         {/* Vocabulary list */}
         {vocabulary.length > 0 && (
           <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
@@ -414,7 +496,7 @@ function P6ReadingLessonPage() {
         {/* Worksheet */}
         {materials.length > 0 && (
           <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
-            <h2 className="font-display text-xl font-bold text-navy">Week 1 worksheet</h2>
+             <h2 className="font-display text-xl font-bold text-navy">Week {weekNumber} worksheet</h2>
             <ul className="mt-4 space-y-2">
               {materials.map((m: any) => (
                 <li key={m.id}>
@@ -427,7 +509,7 @@ function P6ReadingLessonPage() {
                   >
                     <FileDown className="h-5 w-5 flex-shrink-0 text-gold" />
                     <span className="flex-1">
-                      <span className="block">Download Week 1 Worksheet</span>
+                       <span className="block">Download Week {weekNumber} Worksheet</span>
                       {m.description && <span className="block text-xs font-normal text-navy-foreground/75">{m.description}</span>}
                     </span>
                     <Download className="h-4 w-4 flex-shrink-0" />
@@ -457,6 +539,7 @@ function P6ReadingLessonPage() {
               assignment={assignment}
               studentId={user.id}
               pendingLabel="Awaiting teacher review"
+              allowTextOnly={isLessonTwo}
               onSubmitted={() => qc.invalidateQueries({ queryKey: ["submission", assignment.id] })}
             />
           </>
@@ -468,12 +551,12 @@ function P6ReadingLessonPage() {
             alreadyCompleted ? "border-gold bg-gold/10" : "border-dashed border-border bg-card"
           }`}
         >
-          <p className="text-xs font-bold uppercase tracking-wide text-gold-foreground">Week 1</p>
-          <p className="mt-1 font-display text-2xl font-bold text-navy">{alreadyCompleted ? "Week 1 complete" : "Complete Week 1"}</p>
+           <p className="text-xs font-bold uppercase tracking-wide text-gold-foreground">Week {weekNumber}</p>
+           <p className="mt-1 font-display text-2xl font-bold text-navy">{alreadyCompleted ? `Week ${weekNumber} complete` : `You've reached the end of Week ${weekNumber} 🎉`}</p>
           {alreadyCompleted ? (
             <>
               <p className="mt-2 inline-flex items-center gap-2 font-semibold text-navy">
-                <CheckCircle2 className="h-5 w-5 text-gold-foreground" /> Week 1 completed
+                 <CheckCircle2 className="h-5 w-5 text-gold-foreground" /> Lesson {lesson.sort_order} completed
               </p>
               <p className="mt-1 text-sm text-muted-foreground">Your progress has been saved.</p>
               <Link to="/student/p6-reading" className="mt-4 inline-flex items-center gap-2 rounded-lg bg-navy px-6 py-3 font-semibold text-navy-foreground"><LayoutDashboard className="h-4 w-4" /> Primary 6 Reading Skills</Link>
@@ -481,15 +564,18 @@ function P6ReadingLessonPage() {
           ) : (
             <>
               <p className="mt-2 text-sm text-muted-foreground">Before completing the lesson, you should have:</p>
-              <ul className="mt-3 inline-block space-y-1 text-left text-sm">
+               <ul className="mt-3 inline-block space-y-1 text-left text-sm">
+                 {isLessonTwo && <li className={videoWatched ? "text-green-700" : "text-muted-foreground"}>{videoWatched ? "✅" : "⬜"} Watched lesson video</li>}
                 <li className={readConfirmed ? "text-green-700" : "text-muted-foreground"}>
-                  {readConfirmed ? "✅" : "⬜"} Read the lesson and the passage
+                   {readConfirmed ? "✅" : "⬜"} Read the lesson and passage
                 </li>
+                 {isLessonTwo && <li className={readingPracticeDone ? "text-green-700" : "text-muted-foreground"}>{readingPracticeDone ? "✅" : "⬜"} Completed reading practice</li>}
+                 {isLessonTwo && <li className={mainIdeaDone ? "text-green-700" : "text-muted-foreground"}>{mainIdeaDone ? "✅" : "⬜"} Completed Main Idea activity</li>}
                 <li className={quizPassed ? "text-green-700" : "text-muted-foreground"}>
-                  {quizPassed ? "✅" : "⬜"} Passed the Week 1 quiz (4 of 5)
+                   {quizPassed ? "✅" : "⬜"} Passed the Week {weekNumber} quiz (4 of 5)
                 </li>
                 <li className={assignmentDone ? "text-green-700" : "text-muted-foreground"}>
-                  {assignmentDone ? "✅" : "⬜"} Submitted the Week 1 assignment
+                   {assignmentDone ? "✅" : "⬜"} Submitted the Week {weekNumber} assignment
                 </li>
               </ul>
               <Button
@@ -502,7 +588,7 @@ function P6ReadingLessonPage() {
               </Button>
               {!canComplete && (
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Confirm that you have read the passage, pass the quiz and submit your assignment to unlock this button.
+                   Complete every Week {weekNumber} requirement above to unlock this button.
                 </p>
               )}
             </>

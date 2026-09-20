@@ -1,7 +1,7 @@
 /**
  * Shared content + constants for the Primary 6 Reading Skills course.
  * Lesson text, video, quiz, assignment and worksheet live in the database;
- * the interactive reading activities for Week 1 live here.
+ * the interactive reading activities for the published weeks live here.
  */
 
 export const P6_READING_SLUG = "p6-reading";
@@ -126,4 +126,64 @@ export const READING_VOCABULARY: Record<string, string> = {
   "Context clue": "A nearby word, sentence or picture that helps you work out a difficult word.",
   Unfamiliar: "Not known or recognised — something you have not met before.",
   Reread: "To read a part again so that you understand it better.",
+  Maintain: "To take care of something so that it stays in good condition.",
 };
+
+export const WEEK_TWO_INTRO =
+  "The main idea is the most important point the writer wants the reader to understand. Supporting details are the facts, examples, descriptions or information that help explain the main idea.";
+
+export const WEEK_TWO_PASSAGE = {
+  title: "The School Garden",
+  paragraphs: [
+    "Behind the classrooms at Greenfield Primary School was a small garden that students helped to maintain. Every Monday afternoon, different groups of students watered the plants, removed weeds, and checked the vegetables.",
+    "At first, the garden contained only a few plants. Over time, the students learned how to care for tomatoes, peppers, carrots, and leafy vegetables. Their science teacher often used the garden to teach them about plants, soil, insects, and the importance of caring for the environment.",
+    "The students were proud of the garden because their work had turned an empty space into a useful learning area. They also enjoyed sharing some of the vegetables with the school kitchen.",
+  ],
+};
+
+export const WEEK_TWO_COMPREHENSION: ActivityQuestion[] = [
+  {
+    question: "What is the passage mainly about?",
+    options: ["How students prepare food", "How students care for and learn from a school garden", "Why students dislike gardening", "How teachers decorate classrooms"],
+    correctIndex: 1,
+  },
+  {
+    question: "Which detail supports the main idea?",
+    options: ["Students watered plants and removed weeds.", "The classrooms were painted.", "Students played football after school.", "The school bought new desks."],
+    correctIndex: 0,
+  },
+  {
+    question: "Why did the science teacher use the garden?",
+    options: ["To give students a place to play", "To teach students about plants, soil, insects, and the environment", "To store school equipment", "To prepare students for sports"],
+    correctIndex: 1,
+  },
+  {
+    question: "Which sentence best summarizes the passage?",
+    options: ["Students learned to care for a garden that became a useful learning space.", "Students spent all their time outside.", "The school built a large farm.", "Teachers did all the gardening."],
+    correctIndex: 0,
+  },
+];
+
+export const MAIN_IDEA_CHECK = [
+  "What is this passage mostly about?",
+  "Which idea appears throughout the passage?",
+  "Which details support that idea?",
+  "Can I explain the passage in one sentence?",
+];
+
+export const MAIN_IDEA_STATEMENTS = [
+  { text: "Students care for a school garden that helps them learn.", answer: "main" as const },
+  { text: "Students water the plants every Monday afternoon.", answer: "detail" as const },
+  { text: "The garden helps students learn about plants and the environment.", answer: "main" as const },
+  { text: "The garden contains tomatoes, peppers, carrots and leafy vegetables.", answer: "detail" as const },
+  { text: "Students share some vegetables with the school kitchen.", answer: "detail" as const },
+];
+
+export const WEEK_TWO_VOCABULARY: ActivityQuestion[] = [
+  {
+    question: 'What does "maintain" mean in the sentence, "Students helped to maintain the garden"?',
+    options: ["To leave it alone", "To take care of it so it stays in good condition", "To remove everything", "To hide it from others"],
+    correctIndex: 1,
+    explanation: "The students watered, weeded and checked the plants. These actions helped keep the garden in good condition.",
+  },
+];

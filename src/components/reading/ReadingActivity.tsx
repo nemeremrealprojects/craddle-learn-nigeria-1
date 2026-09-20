@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, HelpCircle } from "lucide-react";
 import type { ActivityQuestion } from "@/lib/p6-reading";
 import { Button } from "@/components/ui/button";
@@ -12,12 +12,18 @@ export function ReadingActivity({
   heading,
   intro,
   questions,
+  onComplete,
 }: {
   heading: string;
   intro?: string;
   questions: ActivityQuestion[];
+  onComplete?: () => void;
 }) {
   const [picked, setPicked] = useState<Record<number, number>>({});
+
+  useEffect(() => {
+    if (questions.length > 0 && Object.keys(picked).length === questions.length) onComplete?.();
+  }, [picked, questions.length, onComplete]);
 
   return (
     <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">

@@ -23,11 +23,13 @@ export function AssignmentUpload({
   studentId,
   onSubmitted,
   pendingLabel,
+  allowTextOnly = false,
 }: {
   assignment: AssignmentData;
   studentId: string;
   onSubmitted?: () => void;
   pendingLabel?: string;
+  allowTextOnly?: boolean;
 }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -51,17 +53,20 @@ export function AssignmentUpload({
 
   async function submit() {
     const file = fileRef.current?.files?.[0];
-    if (!file) return toast.error("Please choose your work to upload first.");
-    if (!ACCEPTED_UPLOAD_TYPES.includes(file.type)) return toast.error(`Please upload a ${ACCEPTED_UPLOAD_LABEL} file.`);
-    if (file.size > MAX_UPLOAD_BYTES) return toast.error("That file is larger than 10MB. Please upload a smaller one.");
+    if (!file && (!allowTextOnly || !note.trim())) return toast.error("Please write your response or choose a file to upload.");
+    if (file && !ACCEPTED_UPLOAD_TYPES.includes(file.type)) return toast.error(`Please upload a ${ACCEPTED_UPLOAD_LABEL} file.`);
+    if (file && file.size > MAX_UPLOAD_BYTES) return toast.error("That file is larger than 10MB. Please upload a smaller one.");
 
     setBusy(true);
-    const ext = file.name.split(".").pop()?.toLowerCase() || "dat";
-    const path = `${studentId}/${assignment.id}/${Date.now()}.${ext}`;
-    const { error: upErr } = await supabase.storage.from(SUBMISSION_BUCKET).upload(path, file, { upsert: false });
-    if (upErr) {
-      setBusy(false);
-      return toast.error(upErr.message);
+    let path: string | null = null;
+    if (file) {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "dat";
+      path = `${studentId}/${assignment.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from(SUBMISSION_BUCKET).upload(path, file, { upsert: false });
+      if (upErr) {
+        setBusy(false);
+        return toast.error(upErr.message);
+      }
     }
     const { error } = await supabase.from("submissions").insert({
       assignment_id: assignment.id,
@@ -104,23 +109,23 @@ export function AssignmentUpload({
       ) : (
         <div className="mt-4 space-y-3">
           <label className="block">
+            <span className="text-sm font-semibold text-navy">{allowTextOnly ? "Written response" : "Note for your teacher (optional)"}</span>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              rows={allowTextOnly ? 6 : 2}
+              maxLength={2000}
+              className="mt-1 block w-full rounded-lg border border-border bg-card p-2.5 text-sm"
+              placeholder={allowTextOnly ? "Write the main idea and two supporting details…" : "I read the alphabet to my mum!"}
+            />
+          </label>
+          <label className="block">
             <span className="text-sm font-semibold text-navy">Upload your work ({ACCEPTED_UPLOAD_LABEL})</span>
             <input
               ref={fileRef}
               type="file"
               accept=".pdf,.docx,.jpg,.jpeg,.png"
               className="mt-1 block w-full cursor-pointer rounded-lg border border-border bg-card p-2.5 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-navy file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-navy-foreground"
-            />
-          </label>
-          <label className="block">
-            <span className="text-sm font-semibold text-navy">Note for your teacher (optional)</span>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              rows={2}
-              maxLength={500}
-              className="mt-1 block w-full rounded-lg border border-border bg-card p-2.5 text-sm"
-              placeholder="I read the alphabet to my mum!"
             />
           </label>
           <button

@@ -22,6 +22,7 @@ export interface SummerProgressRow {
   completed: boolean;
   position_seconds: number;
   updated_at: string;
+  responses: Record<string, unknown>;
 }
 
 export function useSummerCourse(slug: string = SUMMER_ENGLISH_SLUG) {
@@ -81,13 +82,27 @@ export function useSummerProgress(courseId?: string, userId?: string) {
     queryFn: async () => {
       const { data } = await supabase
         .from("lesson_progress")
-        .select("lesson_id, completed, position_seconds, updated_at")
+        .select("lesson_id, completed, position_seconds, updated_at, responses")
         .eq("course_id", courseId!)
         .eq("student_id", userId!)
         .order("updated_at", { ascending: false });
       return (data ?? []) as SummerProgressRow[];
     },
   });
+}
+
+export async function saveLessonResponses(
+  studentId: string,
+  courseId: string,
+  lessonId: string,
+  responses: Record<string, unknown>,
+) {
+  await supabase
+    .from("lesson_progress")
+    .upsert(
+      { student_id: studentId, course_id: courseId, lesson_id: lessonId, responses, updated_at: new Date().toISOString() },
+      { onConflict: "student_id,lesson_id" },
+    );
 }
 
 /** Aggregated course stats used by the dashboard. */

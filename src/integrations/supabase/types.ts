@@ -250,6 +250,7 @@ export type Database = {
           id: string
           lesson_id: string
           position_seconds: number
+          responses: Json
           student_id: string
           updated_at: string
         }
@@ -259,6 +260,7 @@ export type Database = {
           id?: string
           lesson_id: string
           position_seconds?: number
+          responses?: Json
           student_id: string
           updated_at?: string
         }
@@ -268,6 +270,7 @@ export type Database = {
           id?: string
           lesson_id?: string
           position_seconds?: number
+          responses?: Json
           student_id?: string
           updated_at?: string
         }

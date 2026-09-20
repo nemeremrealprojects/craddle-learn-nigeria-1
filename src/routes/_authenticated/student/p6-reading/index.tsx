@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_authenticated/student/p6-reading/")({
       { title: "Primary 6 Reading Skills — CRF Online Academy" },
       {
         name: "description",
-        content: "Your Primary 6 Reading Skills dashboard: Week 1 Reading Foundations, progress and certificate status.",
+         content: "Your Primary 6 Reading Skills dashboard: published reading lessons, progress and certificate status.",
       },
       { name: "robots", content: "noindex" },
     ],

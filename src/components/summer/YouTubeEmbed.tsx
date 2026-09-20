@@ -7,7 +7,7 @@ import { youtubeId } from "@/lib/summer-english";
  * official YouTube iframe player after a tap. Keeps lesson pages fast on
  * slower connections, and always plays inside the site (never a new tab).
  */
-export function YouTubeEmbed({ url, title, poster }: { url: string; title: string; poster?: string | null }) {
+export function YouTubeEmbed({ url, title, poster, onPlay }: { url: string; title: string; poster?: string | null; onPlay?: () => void }) {
   const id = youtubeId(url);
   const [play, setPlay] = useState(false);
 
@@ -34,7 +34,10 @@ export function YouTubeEmbed({ url, title, poster }: { url: string; title: strin
   return (
     <button
       type="button"
-      onClick={() => setPlay(true)}
+      onClick={() => {
+        setPlay(true);
+        onPlay?.();
+      }}
       aria-label={`Play video: ${title}`}
       className="group relative h-full w-full"
     >

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Award, BookOpen, CheckCircle2, Clock, ListChecks, Loader2, PlayCircle } from "lucide-react";
+import { Award, BookOpen, CheckCircle2, Clock, ListChecks, Loader2, LockKeyhole, PlayCircle } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/lib/auth-context";
@@ -143,6 +143,13 @@ function P6ReadingDashboard() {
         <ol className="mt-4 space-y-3">
           {lessons.map((l) => {
             const done = stats.completedIds.has(l.id);
+            const locked = l.sort_order === 2 && !stats.completedIds.has(lessons.find((lesson) => lesson.sort_order === 1)?.id ?? "");
+            if (locked) return (
+              <li key={l.id} className="flex items-start gap-3 rounded-2xl border border-border bg-card p-4 opacity-70 shadow-card sm:p-5">
+                <LockKeyhole className="mt-0.5 h-6 w-6 text-muted-foreground" />
+                <span className="flex-1"><span className="block text-xs font-bold uppercase tracking-widest text-gold-foreground">{l.module_title}</span><span className="mt-0.5 block font-display text-lg font-bold text-navy">Lesson {l.sort_order}: {l.title}</span><span className="mt-2 block text-xs font-semibold text-muted-foreground">Complete Week 1 to unlock Week 2</span></span>
+              </li>
+            );
             return (
               <li key={l.id}>
                 <Link

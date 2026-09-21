@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { PASS_PERCENT, SUMMER_ENGLISH_SLUG, SUMMER_ENGLISH_TOTAL_LESSONS } from "@/lib/summer-english";
 
 export interface SummerLesson {
@@ -22,7 +23,7 @@ export interface SummerProgressRow {
   completed: boolean;
   position_seconds: number;
   updated_at: string;
-  responses: Record<string, unknown>;
+  responses: Json;
 }
 
 export function useSummerCourse(slug: string = SUMMER_ENGLISH_SLUG) {
@@ -95,7 +96,7 @@ export async function saveLessonResponses(
   studentId: string,
   courseId: string,
   lessonId: string,
-  responses: Record<string, unknown>,
+  responses: Json,
 ) {
   await supabase
     .from("lesson_progress")

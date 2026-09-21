@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ClipboardList, Upload, CheckCircle2, FileUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
   ACCEPTED_UPLOAD_LABEL,
@@ -24,12 +25,14 @@ export function AssignmentUpload({
   onSubmitted,
   pendingLabel,
   allowTextOnly = false,
+  submittedLabel,
 }: {
   assignment: AssignmentData;
   studentId: string;
   onSubmitted?: () => void;
   pendingLabel?: string;
   allowTextOnly?: boolean;
+  submittedLabel?: string;
 }) {
   const qc = useQueryClient();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -96,7 +99,7 @@ export function AssignmentUpload({
       {submission ? (
         <div className="mt-4 rounded-xl border border-green-300 bg-green-50 p-4">
           <div className="inline-flex items-center gap-2 font-semibold text-green-800">
-            <CheckCircle2 className="h-5 w-5" /> Assignment submitted
+             <CheckCircle2 className="h-5 w-5" /> {submittedLabel ?? "Assignment submitted"}
           </div>
           <p className="mt-1 text-sm text-green-800/80">
             Sent on {new Date(submission.submitted_at).toLocaleDateString()} ·{" "}
@@ -128,15 +131,15 @@ export function AssignmentUpload({
               className="mt-1 block w-full cursor-pointer rounded-lg border border-border bg-card p-2.5 text-sm file:mr-3 file:rounded-md file:border-0 file:bg-navy file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-navy-foreground"
             />
           </label>
-          <button
+          <Button
             type="button"
             onClick={submit}
             disabled={busy}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold-gradient p-3 font-bold text-gold-foreground shadow-gold disabled:opacity-60 sm:w-auto sm:px-6"
+            className="h-12 w-full bg-gold-gradient font-bold text-gold-foreground shadow-gold sm:w-auto sm:px-6"
           >
             {busy ? <Upload className="h-4 w-4 animate-pulse" /> : <FileUp className="h-4 w-4" />}
             {busy ? "Uploading…" : "Submit assignment"}
-          </button>
+          </Button>
         </div>
       )}
     </section>

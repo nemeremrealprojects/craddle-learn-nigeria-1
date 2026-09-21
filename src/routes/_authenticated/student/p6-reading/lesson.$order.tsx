@@ -173,18 +173,24 @@ function P6ReadingLessonPage() {
   const assignmentDone = !!assignment && !!submission;
   const alreadyCompleted = !!progress.find((p) => p.lesson_id === lesson?.id && p.completed);
   const lessonProgress = progress.find((p) => p.lesson_id === lesson?.id);
-  const isLessonTwo = lesson.sort_order === 2;
-  const storedResponses = lessonProgress?.responses ?? {};
-  const storedWeekTwo = typeof storedResponses.weekTwo === "object" && storedResponses.weekTwo !== null
+  const isLessonTwo = lesson?.sort_order === 2;
+  const storedResponses = lessonProgress?.responses && typeof lessonProgress.responses === "object" && !Array.isArray(lessonProgress.responses)
+    ? lessonProgress.responses
+    : {};
+  const storedWeekTwo = typeof storedResponses.weekTwo === "object" && storedResponses.weekTwo !== null && !Array.isArray(storedResponses.weekTwo)
     ? storedResponses.weekTwo as { mainIdeaAnswers?: Record<string, MainIdeaChoice>; mainIdeaComplete?: boolean }
     : {};
+  const persistedVideoWatched = !!storedResponses.videoWatched;
+  const persistedReadConfirmed = !!storedResponses.readConfirmed;
+  const persistedReadingPracticeDone = !!storedResponses.readingPracticeDone;
   const mainIdeaDone = !!storedWeekTwo.mainIdeaComplete;
-  const weekTwoRequirements = [videoWatched, readConfirmed, readingPracticeDone, mainIdeaDone, quizPassed, assignmentDone];
+  const weekTwoRequirements = [videoWatched || persistedVideoWatched, readConfirmed || persistedReadConfirmed, readingPracticeDone || persistedReadingPracticeDone, mainIdeaDone, quizPassed, assignmentDone];
   const weekOneRequirements = [readConfirmed, quizPassed, assignmentDone];
   const requirements = isLessonTwo ? weekTwoRequirements : weekOneRequirements;
   const canComplete = requirements.every(Boolean);
   const completedSteps = alreadyCompleted ? requirements.length : requirements.filter(Boolean).length;
   const weekProgress = Math.round((completedSteps / requirements.length) * 100);
+  const courseProgress = Math.round((progress.filter((row) => row.completed).length / 12) * 100);
 
   async function completeLesson() {
     if (!user || !course || !lesson) return;
@@ -201,6 +207,12 @@ function P6ReadingLessonPage() {
     });
     await qc.invalidateQueries({ queryKey: ["summer-progress", course.id, user.id] });
     setSavingActivity(false);
+  }
+
+  async function saveWeekTwoResponse(key: "videoWatched" | "readConfirmed" | "readingPracticeDone") {
+    if (!user || !course || !lesson) return;
+    await saveLessonResponses(user.id, course.id, lesson.id, { ...storedResponses, [key]: true });
+    await qc.invalidateQueries({ queryKey: ["summer-progress", course.id, user.id] });
   }
 
   if (loadingCourse || loadingEnroll) {
@@ -264,6 +276,7 @@ function P6ReadingLessonPage() {
   const weekNumber = isLessonTwo ? 2 : 1;
   const moduleName = isLessonTwo ? "Reading for Main Idea and Supporting Details" : "Reading Foundations";
   const estimatedTime = isLessonTwo ? "40–50 minutes" : "35–45 minutes";
+  const displayProgress = isLessonTwo ? courseProgress : weekProgress;
   const vocabulary = (lesson.vocabulary ?? []).map((word) => ({
     word,
     meaning: READING_VOCABULARY[word] ?? null,
@@ -281,13 +294,13 @@ function P6ReadingLessonPage() {
           </div>
           <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl">{lesson.title}</h1>
            <p className="mt-2 text-sm text-navy-foreground/80">Estimated time: {estimatedTime}</p>
-           <div className="mt-6 max-w-xl" aria-label={`Week ${weekNumber} progress: ${weekProgress}%`}>
+           <div className="mt-6 max-w-xl" aria-label={`${isLessonTwo ? "Course" : `Week ${weekNumber}`} progress: ${displayProgress}%`}>
             <div className="mb-2 flex items-center justify-between gap-4 text-sm font-semibold">
-               <span>Week {weekNumber} progress</span>
-              <span>{weekProgress}%</span>
+                <span>{isLessonTwo ? "Course progress" : `Week ${weekNumber} progress`}</span>
+               <span>{displayProgress}%</span>
             </div>
             <div className="h-2.5 overflow-hidden rounded-full bg-navy-foreground/20">
-              <div className="h-full rounded-full bg-gold transition-[width] duration-500" style={{ width: `${weekProgress}%` }} />
+               <div className="h-full rounded-full bg-gold transition-[width] duration-500" style={{ width: `${displayProgress}%` }} />
             </div>
           </div>
            {alreadyCompleted && <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-gold"><CheckCircle2 className="h-4 w-4" /> Week {weekNumber} completed</p>}
@@ -338,7 +351,7 @@ function P6ReadingLessonPage() {
                 url={lesson.video_url}
                 title={isLessonTwo ? "Finding the Main Idea and Supporting Details" : "Reading Comprehension for Kids | How to Read for Meaning"}
                 poster={lesson.thumbnail_url}
-                onPlay={isLessonTwo ? () => setVideoWatched(true) : undefined}
+                onPlay={isLessonTwo ? () => { setVideoWatched(true); void saveWeekTwoResponse("videoWatched"); } : undefined}
               />
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -348,7 +361,7 @@ function P6ReadingLessonPage() {
         )}
 
         {/* Teaching material */}
-        {lesson.notes && (
+        {lesson.notes && isLessonOne && (
           <section className="rounded-2xl border border-border bg-card p-4 shadow-card sm:p-6">
             <h2 className="inline-flex items-center gap-2 font-display text-xl font-bold text-navy">
               <BookMarked className="h-5 w-5 text-gold-foreground" /> What does it mean to be a good reader?
@@ -366,11 +379,7 @@ function P6ReadingLessonPage() {
                   </li>
                 ))}
               </ol>
-            ) : (
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-foreground/90 sm:text-base">
-                {lesson.notes}
-              </p>
-            )}
+            ) : null}
           </section>
         )}
 
@@ -469,10 +478,10 @@ function P6ReadingLessonPage() {
               <p className="text-xs font-bold uppercase tracking-wide text-gold-foreground">Reading practice</p>
               <h2 className="mt-2 inline-flex items-center gap-2 font-display text-2xl font-bold text-navy"><BookOpenText className="h-5 w-5 text-gold-foreground" /> {WEEK_TWO_PASSAGE.title}</h2>
               <div className="mt-5 max-w-3xl space-y-4 text-base leading-8 text-foreground/90 sm:text-lg">{WEEK_TWO_PASSAGE.paragraphs.map((paragraph) => <p key={paragraph.slice(0, 24)}>{paragraph}</p>)}</div>
-              <label className="mt-6 flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-cream p-3 text-sm font-semibold text-navy"><input type="checkbox" checked={readConfirmed} onChange={(event) => setReadConfirmed(event.target.checked)} className="h-4 w-4 accent-[hsl(var(--navy))]" /> I have read the lesson and passage</label>
+              <label className="mt-6 flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-cream p-3 text-sm font-semibold text-navy"><input type="checkbox" checked={readConfirmed || persistedReadConfirmed} onChange={(event) => { setReadConfirmed(event.target.checked); if (event.target.checked) void saveWeekTwoResponse("readConfirmed"); }} className="h-4 w-4 accent-[hsl(var(--navy))]" /> I have read the lesson and passage</label>
             </section>
 
-            <ReadingActivity heading="Let's think about the passage" intro="Choose an answer to see instant feedback." questions={WEEK_TWO_COMPREHENSION} onComplete={() => setReadingPracticeDone(true)} />
+            <ReadingActivity heading="Let's think about the passage" intro="Choose an answer to see instant feedback." questions={WEEK_TWO_COMPREHENSION} onComplete={() => { setReadingPracticeDone(true); void saveWeekTwoResponse("readingPracticeDone"); }} />
             <MainIdeaActivity statements={MAIN_IDEA_STATEMENTS} initialAnswers={Object.fromEntries(Object.entries(storedWeekTwo.mainIdeaAnswers ?? {}).map(([key, value]) => [Number(key), value]))} completed={mainIdeaDone} saving={savingActivity} onSubmit={saveMainIdeaActivity} />
             <ReadingActivity heading="Vocabulary activity" questions={WEEK_TWO_VOCABULARY} />
           </>
@@ -540,6 +549,7 @@ function P6ReadingLessonPage() {
               studentId={user.id}
               pendingLabel="Awaiting teacher review"
               allowTextOnly={isLessonTwo}
+              submittedLabel={isLessonTwo ? "Submitted — Awaiting teacher review" : undefined}
               onSubmitted={() => qc.invalidateQueries({ queryKey: ["submission", assignment.id] })}
             />
           </>
@@ -565,11 +575,11 @@ function P6ReadingLessonPage() {
             <>
               <p className="mt-2 text-sm text-muted-foreground">Before completing the lesson, you should have:</p>
                <ul className="mt-3 inline-block space-y-1 text-left text-sm">
-                 {isLessonTwo && <li className={videoWatched ? "text-green-700" : "text-muted-foreground"}>{videoWatched ? "✅" : "⬜"} Watched lesson video</li>}
-                <li className={readConfirmed ? "text-green-700" : "text-muted-foreground"}>
-                   {readConfirmed ? "✅" : "⬜"} Read the lesson and passage
+                  {isLessonTwo && <li className={videoWatched || persistedVideoWatched ? "text-green-700" : "text-muted-foreground"}>{videoWatched || persistedVideoWatched ? "✅" : "⬜"} Watched lesson video</li>}
+                 <li className={readConfirmed || persistedReadConfirmed ? "text-green-700" : "text-muted-foreground"}>
+                    {readConfirmed || persistedReadConfirmed ? "✅" : "⬜"} Read the lesson and passage
                 </li>
-                 {isLessonTwo && <li className={readingPracticeDone ? "text-green-700" : "text-muted-foreground"}>{readingPracticeDone ? "✅" : "⬜"} Completed reading practice</li>}
+                 {isLessonTwo && <li className={readingPracticeDone || persistedReadingPracticeDone ? "text-green-700" : "text-muted-foreground"}>{readingPracticeDone || persistedReadingPracticeDone ? "✅" : "⬜"} Completed reading practice</li>}
                  {isLessonTwo && <li className={mainIdeaDone ? "text-green-700" : "text-muted-foreground"}>{mainIdeaDone ? "✅" : "⬜"} Completed Main Idea activity</li>}
                 <li className={quizPassed ? "text-green-700" : "text-muted-foreground"}>
                    {quizPassed ? "✅" : "⬜"} Passed the Week {weekNumber} quiz (4 of 5)

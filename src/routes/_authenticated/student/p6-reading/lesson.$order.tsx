@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Lightbulb,
   Loader2,
+  LockKeyhole,
   PlayCircle,
   Target,
 } from "lucide-react";

@@ -9,59 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AdmissionsRouteImport } from './routes/admissions'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SummerRouteImport } from './routes/summer'
-import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdmissionsRouteImport } from './routes/admissions'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as CoursesIndexRouteImport } from './routes/courses.index'
-import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
 import { Route as PaymentCallbackRouteImport } from './routes/payment.callback'
-import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
-import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenticated/parent/index'
-import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authenticated/student/index'
+import { Route as CoursesSlugRouteImport } from './routes/courses.$slug'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedTeacherIndexRouteImport } from './routes/_authenticated/teacher/index'
+import { Route as AuthenticatedStudentIndexRouteImport } from './routes/_authenticated/student/index'
+import { Route as AuthenticatedParentIndexRouteImport } from './routes/_authenticated/parent/index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ApiPublicPaystackWebhookRouteImport } from './routes/api/public/paystack-webhook'
-import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
-import { Route as AuthenticatedStudentP6ReadingIndexRouteImport } from './routes/_authenticated/student/p6-reading/index'
-import { Route as AuthenticatedStudentSummerEnglishIndexRouteImport } from './routes/_authenticated/student/summer-english/index'
+import { Route as AuthenticatedAdminVideosRouteImport } from './routes/_authenticated/admin/videos'
 import { Route as AuthenticatedStudentSummerMathematicsIndexRouteImport } from './routes/_authenticated/student/summer-mathematics/index'
-import { Route as AuthenticatedStudentP6ReadingLessonOrderRouteImport } from './routes/_authenticated/student/p6-reading/lesson.$order'
-import { Route as AuthenticatedStudentSummerEnglishLessonOrderRouteImport } from './routes/_authenticated/student/summer-english/lesson.$order'
+import { Route as AuthenticatedStudentSummerEnglishIndexRouteImport } from './routes/_authenticated/student/summer-english/index'
+import { Route as AuthenticatedStudentP6ReadingIndexRouteImport } from './routes/_authenticated/student/p6-reading/index'
+import { Route as AuthenticatedStudentCoursesSlugRouteImport } from './routes/_authenticated/student/courses/$slug'
 import { Route as AuthenticatedStudentSummerMathematicsLessonOrderRouteImport } from './routes/_authenticated/student/summer-mathematics/lesson.$order'
+import { Route as AuthenticatedStudentSummerEnglishLessonOrderRouteImport } from './routes/_authenticated/student/summer-english/lesson.$order'
+import { Route as AuthenticatedStudentP6ReadingLessonOrderRouteImport } from './routes/_authenticated/student/p6-reading/lesson.$order'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdmissionsRoute = AdmissionsRouteImport.update({
-  id: '/admissions',
-  path: '/admissions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const SummerRoute = SummerRouteImport.update({
+  id: '/summer',
+  path: '/summer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -69,24 +45,38 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SummerRoute = SummerRouteImport.update({
-  id: '/summer',
-  path: '/summer',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: '/callback',
-  path: '/callback',
-  getParentRoute: () => AuthRoute,
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmissionsRoute = AdmissionsRouteImport.update({
+  id: '/admissions',
+  path: '/admissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CoursesIndexRoute = CoursesIndexRouteImport.update({
   id: '/courses/',
   path: '/courses/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CoursesSlugRoute = CoursesSlugRouteImport.update({
-  id: '/courses/$slug',
-  path: '/courses/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PaymentCallbackRoute = PaymentCallbackRouteImport.update({
@@ -94,21 +84,20 @@ const PaymentCallbackRoute = PaymentCallbackRouteImport.update({
   path: '/payment/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => AuthenticatedRoute,
+const CoursesSlugRoute = CoursesSlugRouteImport.update({
+  id: '/courses/$slug',
+  path: '/courses/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAdminVideosRoute =
-  AuthenticatedAdminVideosRouteImport.update({
-    id: '/admin/videos',
-    path: '/admin/videos',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedParentIndexRoute =
-  AuthenticatedParentIndexRouteImport.update({
-    id: '/parent/',
-    path: '/parent/',
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthenticatedTeacherIndexRoute =
+  AuthenticatedTeacherIndexRouteImport.update({
+    id: '/teacher/',
+    path: '/teacher/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedStudentIndexRoute =
@@ -117,34 +106,27 @@ const AuthenticatedStudentIndexRoute =
     path: '/student/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedTeacherIndexRoute =
-  AuthenticatedTeacherIndexRouteImport.update({
-    id: '/teacher/',
-    path: '/teacher/',
+const AuthenticatedParentIndexRoute =
+  AuthenticatedParentIndexRouteImport.update({
+    id: '/parent/',
+    path: '/parent/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const ApiPublicPaystackWebhookRoute =
   ApiPublicPaystackWebhookRouteImport.update({
     id: '/api/public/paystack-webhook',
     path: '/api/public/paystack-webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedStudentCoursesSlugRoute =
-  AuthenticatedStudentCoursesSlugRouteImport.update({
-    id: '/student/courses/$slug',
-    path: '/student/courses/$slug',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedStudentP6ReadingIndexRoute =
-  AuthenticatedStudentP6ReadingIndexRouteImport.update({
-    id: '/student/p6-reading/',
-    path: '/student/p6-reading/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedStudentSummerEnglishIndexRoute =
-  AuthenticatedStudentSummerEnglishIndexRouteImport.update({
-    id: '/student/summer-english/',
-    path: '/student/summer-english/',
+const AuthenticatedAdminVideosRoute =
+  AuthenticatedAdminVideosRouteImport.update({
+    id: '/admin/videos',
+    path: '/admin/videos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedStudentSummerMathematicsIndexRoute =
@@ -153,10 +135,28 @@ const AuthenticatedStudentSummerMathematicsIndexRoute =
     path: '/student/summer-mathematics/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedStudentP6ReadingLessonOrderRoute =
-  AuthenticatedStudentP6ReadingLessonOrderRouteImport.update({
-    id: '/student/p6-reading/lesson/$order',
-    path: '/student/p6-reading/lesson/$order',
+const AuthenticatedStudentSummerEnglishIndexRoute =
+  AuthenticatedStudentSummerEnglishIndexRouteImport.update({
+    id: '/student/summer-english/',
+    path: '/student/summer-english/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentP6ReadingIndexRoute =
+  AuthenticatedStudentP6ReadingIndexRouteImport.update({
+    id: '/student/p6-reading/',
+    path: '/student/p6-reading/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentCoursesSlugRoute =
+  AuthenticatedStudentCoursesSlugRouteImport.update({
+    id: '/student/courses/$slug',
+    path: '/student/courses/$slug',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedStudentSummerMathematicsLessonOrderRoute =
+  AuthenticatedStudentSummerMathematicsLessonOrderRouteImport.update({
+    id: '/student/summer-mathematics/lesson/$order',
+    path: '/student/summer-mathematics/lesson/$order',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedStudentSummerEnglishLessonOrderRoute =
@@ -165,10 +165,10 @@ const AuthenticatedStudentSummerEnglishLessonOrderRoute =
     path: '/student/summer-english/lesson/$order',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedStudentSummerMathematicsLessonOrderRoute =
-  AuthenticatedStudentSummerMathematicsLessonOrderRouteImport.update({
-    id: '/student/summer-mathematics/lesson/$order',
-    path: '/student/summer-mathematics/lesson/$order',
+const AuthenticatedStudentP6ReadingLessonOrderRoute =
+  AuthenticatedStudentP6ReadingLessonOrderRouteImport.update({
+    id: '/student/p6-reading/lesson/$order',
+    path: '/student/p6-reading/lesson/$order',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -351,46 +351,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admissions': {
-      id: '/admissions'
-      path: '/admissions'
-      fullPath: '/admissions'
-      preLoaderRoute: typeof AdmissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+    '/summer': {
+      id: '/summer'
+      path: '/summer'
+      fullPath: '/summer'
+      preLoaderRoute: typeof SummerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -400,32 +365,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/summer': {
-      id: '/summer'
-      path: '/summer'
-      fullPath: '/summer'
-      preLoaderRoute: typeof SummerRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/callback': {
-      id: '/auth/callback'
-      path: '/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof AuthCallbackRouteImport
-      parentRoute: typeof AuthRoute
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admissions': {
+      id: '/admissions'
+      path: '/admissions'
+      fullPath: '/admissions'
+      preLoaderRoute: typeof AdmissionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/courses/': {
       id: '/courses/'
       path: '/courses'
       fullPath: '/courses/'
       preLoaderRoute: typeof CoursesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/courses/$slug': {
-      id: '/courses/$slug'
-      path: '/courses/$slug'
-      fullPath: '/courses/$slug'
-      preLoaderRoute: typeof CoursesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/payment/callback': {
@@ -435,25 +421,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PaymentCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin/': {
-      id: '/_authenticated/admin/'
-      path: '/admin'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/courses/$slug': {
+      id: '/courses/$slug'
+      path: '/courses/$slug'
+      fullPath: '/courses/$slug'
+      preLoaderRoute: typeof CoursesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/admin/videos': {
-      id: '/_authenticated/admin/videos'
-      path: '/admin/videos'
-      fullPath: '/admin/videos'
-      preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
     }
-    '/_authenticated/parent/': {
-      id: '/_authenticated/parent/'
-      path: '/parent'
-      fullPath: '/parent/'
-      preLoaderRoute: typeof AuthenticatedParentIndexRouteImport
+    '/_authenticated/teacher/': {
+      id: '/_authenticated/teacher/'
+      path: '/teacher'
+      fullPath: '/teacher/'
+      preLoaderRoute: typeof AuthenticatedTeacherIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/student/': {
@@ -463,11 +449,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/teacher/': {
-      id: '/_authenticated/teacher/'
-      path: '/teacher'
-      fullPath: '/teacher/'
-      preLoaderRoute: typeof AuthenticatedTeacherIndexRouteImport
+    '/_authenticated/parent/': {
+      id: '/_authenticated/parent/'
+      path: '/parent'
+      fullPath: '/parent/'
+      preLoaderRoute: typeof AuthenticatedParentIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/api/public/paystack-webhook': {
@@ -477,25 +470,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaystackWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/student/courses/$slug': {
-      id: '/_authenticated/student/courses/$slug'
-      path: '/student/courses/$slug'
-      fullPath: '/student/courses/$slug'
-      preLoaderRoute: typeof AuthenticatedStudentCoursesSlugRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/student/p6-reading/': {
-      id: '/_authenticated/student/p6-reading/'
-      path: '/student/p6-reading'
-      fullPath: '/student/p6-reading/'
-      preLoaderRoute: typeof AuthenticatedStudentP6ReadingIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/student/summer-english/': {
-      id: '/_authenticated/student/summer-english/'
-      path: '/student/summer-english'
-      fullPath: '/student/summer-english/'
-      preLoaderRoute: typeof AuthenticatedStudentSummerEnglishIndexRouteImport
+    '/_authenticated/admin/videos': {
+      id: '/_authenticated/admin/videos'
+      path: '/admin/videos'
+      fullPath: '/admin/videos'
+      preLoaderRoute: typeof AuthenticatedAdminVideosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/student/summer-mathematics/': {
@@ -505,11 +484,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentSummerMathematicsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/student/p6-reading/lesson/$order': {
-      id: '/_authenticated/student/p6-reading/lesson/$order'
-      path: '/student/p6-reading/lesson/$order'
-      fullPath: '/student/p6-reading/lesson/$order'
-      preLoaderRoute: typeof AuthenticatedStudentP6ReadingLessonOrderRouteImport
+    '/_authenticated/student/summer-english/': {
+      id: '/_authenticated/student/summer-english/'
+      path: '/student/summer-english'
+      fullPath: '/student/summer-english/'
+      preLoaderRoute: typeof AuthenticatedStudentSummerEnglishIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/p6-reading/': {
+      id: '/_authenticated/student/p6-reading/'
+      path: '/student/p6-reading'
+      fullPath: '/student/p6-reading/'
+      preLoaderRoute: typeof AuthenticatedStudentP6ReadingIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/courses/$slug': {
+      id: '/_authenticated/student/courses/$slug'
+      path: '/student/courses/$slug'
+      fullPath: '/student/courses/$slug'
+      preLoaderRoute: typeof AuthenticatedStudentCoursesSlugRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/student/summer-mathematics/lesson/$order': {
+      id: '/_authenticated/student/summer-mathematics/lesson/$order'
+      path: '/student/summer-mathematics/lesson/$order'
+      fullPath: '/student/summer-mathematics/lesson/$order'
+      preLoaderRoute: typeof AuthenticatedStudentSummerMathematicsLessonOrderRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/student/summer-english/lesson/$order': {
@@ -519,11 +519,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStudentSummerEnglishLessonOrderRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/student/summer-mathematics/lesson/$order': {
-      id: '/_authenticated/student/summer-mathematics/lesson/$order'
-      path: '/student/summer-mathematics/lesson/$order'
-      fullPath: '/student/summer-mathematics/lesson/$order'
-      preLoaderRoute: typeof AuthenticatedStudentSummerMathematicsLessonOrderRouteImport
+    '/_authenticated/student/p6-reading/lesson/$order': {
+      id: '/_authenticated/student/p6-reading/lesson/$order'
+      path: '/student/p6-reading/lesson/$order'
+      fullPath: '/student/p6-reading/lesson/$order'
+      preLoaderRoute: typeof AuthenticatedStudentP6ReadingLessonOrderRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
   }

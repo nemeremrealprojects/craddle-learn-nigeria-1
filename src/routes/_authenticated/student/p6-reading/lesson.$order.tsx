@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   Lightbulb,
   Loader2,
+  LockKeyhole,
   PlayCircle,
   Target,
 } from "lucide-react";
@@ -58,9 +59,9 @@ export const Route = createFileRoute("/_authenticated/student/p6-reading/lesson/
   head: ({ params }) => ({
     meta: [
       { title: `Lesson ${params.order} — Primary 6 Reading Skills | CRF Online Academy` },
-      { name: "description", content: "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
+      { name: "description", content: params.order === "2" ? "Primary 6 Reading Skills Week 2 lesson: Finding the Main Idea." : "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
       { property: "og:title", content: `Lesson ${params.order} — Primary 6 Reading Skills | CRF Online Academy` },
-      { property: "og:description", content: "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
+      { property: "og:description", content: params.order === "2" ? "Primary 6 Reading Skills Week 2 lesson: Finding the Main Idea." : "Primary 6 Reading Skills Week 1 lesson: What Good Readers Do." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -180,6 +181,10 @@ function P6ReadingLessonPage() {
   const storedWeekTwo = typeof storedResponses.weekTwo === "object" && storedResponses.weekTwo !== null && !Array.isArray(storedResponses.weekTwo)
     ? storedResponses.weekTwo as { mainIdeaAnswers?: Record<string, MainIdeaChoice>; mainIdeaComplete?: boolean }
     : {};
+  const initialMainIdeaAnswers = useMemo(
+    () => Object.fromEntries(Object.entries(storedWeekTwo.mainIdeaAnswers ?? {}).map(([key, value]) => [Number(key), value])),
+    [lessonProgress?.updated_at],
+  );
   const persistedVideoWatched = !!storedResponses.videoWatched;
   const persistedReadConfirmed = !!storedResponses.readConfirmed;
   const persistedReadingPracticeDone = !!storedResponses.readingPracticeDone;
@@ -270,6 +275,24 @@ function P6ReadingLessonPage() {
   }
 
   const isLessonOne = lesson.sort_order === 1;
+  const firstLesson = lessons.find((item) => item.sort_order === 1);
+  const firstLessonCompleted = firstLesson ? progress.some((row) => row.lesson_id === firstLesson.id && row.completed) : false;
+  if (isLessonTwo && !firstLessonCompleted) {
+    return (
+      <div className="flex min-h-screen flex-col bg-cream">
+        <Header />
+        <div className="grid flex-1 place-items-center px-4 py-16 text-center">
+          <div className="max-w-md">
+            <LockKeyhole className="mx-auto h-8 w-8 text-gold-foreground" />
+            <h1 className="mt-3 font-display text-2xl font-bold text-navy">Complete Week 1 first</h1>
+            <p className="mt-2 text-muted-foreground">Week 2 unlocks as soon as Lesson 1 is completed. No additional payment is required.</p>
+            <Link to="/student/p6-reading/lesson/$order" params={{ order: "1" }} className="mt-5 inline-flex rounded-lg bg-navy px-6 py-3 font-semibold text-navy-foreground">Go to Week 1</Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   if (!isLessonOne && !isLessonTwo) {
     return null;
   }
@@ -482,7 +505,7 @@ function P6ReadingLessonPage() {
             </section>
 
             <ReadingActivity heading="Let's think about the passage" intro="Choose an answer to see instant feedback." questions={WEEK_TWO_COMPREHENSION} onComplete={() => { setReadingPracticeDone(true); void saveWeekTwoResponse("readingPracticeDone"); }} />
-            <MainIdeaActivity statements={MAIN_IDEA_STATEMENTS} initialAnswers={Object.fromEntries(Object.entries(storedWeekTwo.mainIdeaAnswers ?? {}).map(([key, value]) => [Number(key), value]))} completed={mainIdeaDone} saving={savingActivity} onSubmit={saveMainIdeaActivity} />
+            <MainIdeaActivity statements={MAIN_IDEA_STATEMENTS} initialAnswers={initialMainIdeaAnswers} completed={mainIdeaDone} saving={savingActivity} onSubmit={saveMainIdeaActivity} />
             <ReadingActivity heading="Vocabulary activity" questions={WEEK_TWO_VOCABULARY} />
           </>
         )}
